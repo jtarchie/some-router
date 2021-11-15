@@ -122,4 +122,22 @@ describe("a router", function () {
     );
     expect(callback).toEqual("unicode");
   });
+
+  describe("with all supported HTTP methods", function () {
+    let router: MethodRouter;
+
+    beforeEach(function () {
+      router = new MethodRouter();
+      for (const method in methods) {
+        router[method]("/", `${method} /`);
+      }
+    });
+
+    for (const method in methods) {
+      it(`supports ${method}`, function () {
+        const { callback } = router.find(method, "/");
+        expect(callback).toEqual(`${method} /`);
+      });
+    }
+  });
 });

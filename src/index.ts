@@ -1,6 +1,38 @@
 enum methods {
+  ACL = "ACL",
+  BIND = "BIND",
+  CHECKOUT = "CHECKOUT",
+  CONNECT = "CONNECT",
+  COPY = "COPY",
+  DELETE = "DELETE",
   GET = "GET",
+  HEAD = "HEAD",
+  LINK = "LINK",
+  LOCK = "LOCK",
+  M = "M-SEARCH",
+  MERGE = "MERGE",
+  MKACTIVITY = "MKACTIVITY",
+  MKCALENDAR = "MKCALENDAR",
+  MKCOL = "MKCOL",
+  MOVE = "MOVE",
+  NOTIFY = "NOTIFY",
+  OPTIONS = "OPTIONS",
+  PATCH = "PATCH",
   POST = "POST",
+  PROPFIND = "PROPFIND",
+  PROPPATCH = "PROPPATCH",
+  PURGE = "PURGE",
+  PUT = "PUT",
+  REBIND = "REBIND",
+  REPORT = "REPORT",
+  SEARCH = "SEARCH",
+  SOURCE = "SOURCE",
+  SUBSCRIBE = "SUBSCRIBE",
+  TRACE = "TRACE",
+  UNBIND = "UNBIND",
+  UNLINK = "UNLINK",
+  UNLOCK = "UNLOCK",
+  UNSUBSCRIBE = "UNSUBSCRIBE",
 }
 
 interface Matcher {
@@ -97,6 +129,12 @@ class MethodRouter {
       return pathRouter.find(path);
     }
   }
+}
+
+for (const method in methods) {
+  MethodRouter.prototype[method] = function (path: string, callback: any) {
+    this.on(method, path, callback);
+  };
 }
 
 export default MethodRouter;
