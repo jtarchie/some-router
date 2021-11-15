@@ -110,4 +110,16 @@ describe("a router", function () {
       });
     });
   });
+
+  it("supports unicode characters", function () {
+    const router = new MethodRouter();
+    router.on(methods.GET, "/*", "named");
+    router.on(methods.GET, "/こんにちは", "unicode");
+
+    const { callback } = router.find(
+      "GET",
+      "こんにちは",
+    );
+    expect(callback).toEqual("unicode");
+  });
 });
