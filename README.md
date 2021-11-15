@@ -16,3 +16,15 @@ const { callback } = router.find('/');
 callback();
 // stdout: /
 ```
+
+## Development
+
+For development, the [`deno`](https://deno.land/) tool is used for linting and formatting.
+
+On Mac OS, we've included assistance for development.
+
+```bash
+brew bundle
+yarn install
+yarn run test
+```
