@@ -9,13 +9,14 @@
     "benny": "^3.7.1",
     "esbuild": "^0.13.13",
     "esbuild-jest": "^0.5.0",
+    "find-my-way": "^5.0.0",
     "jest": "^27.3.1",
     "ts-node": "^10.4.0",
     "typescript": "^4.4.4"
   },
   "scripts": {
     "bench": "ts-node src/benchmark.ts",
-    "build": "npx esbuild --platform=node --outfile=dist/index.js --bundle --sourcemap=inline src/index.ts",
+    "build": "npx esbuild --platform=node --minify --outfile=dist/index.js --bundle --sourcemap=external src/index.ts",
     "fmt": "deno fmt src/",
     "lint": "deno lint --rules-tags=recommendation src/",
     "test": "yarn run lint && yarn run fmt && npx jest"

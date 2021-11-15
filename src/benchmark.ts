@@ -1,5 +1,6 @@
 import b from "benny";
 import { MethodRouter, methods } from ".";
+import Router from "find-my-way";
 
 const routes = [
   { method: methods.GET, url: "/user" },
@@ -18,39 +19,77 @@ const routes = [
 
 function noop() {}
 
-const router = new MethodRouter();
+const router1 = new MethodRouter();
 
 routes.forEach(function (route) {
-  router.on(route.method, route.url, noop);
+  router1.on(route.method, route.url, noop);
 });
 
 b.suite(
-  "routes",
+  "some-router routes",
   b.add("short static", function () {
-    const _ = router.find("GET", "/user");
+    const _ = router1.find("GET", "/user");
   }),
   b.add("static with some radix", function () {
-    const _ = router.find("GET", "/user/comments");
+    const _ = router1.find("GET", "/user/comments");
   }),
   b.add("dynamic route", function () {
-    const _ = router.find("GET", "/user/lookup/username/john");
+    const _ = router1.find("GET", "/user/lookup/username/john");
   }),
   b.add("mixed static dynamic", function () {
-    const _ = router.find("GET", "/event/abcd1234/comments");
+    const _ = router1.find("GET", "/event/abcd1234/comments");
   }),
   b.add("long static", function () {
-    const _ = router.find("GET", "/very/deeply/nested/route/hello/there");
+    const _ = router1.find("GET", "/very/deeply/nested/route/hello/there");
   }),
   b.add("wildcard", function () {
-    const _ = router.find("GET", "/static/index.html");
+    const _ = router1.find("GET", "/static/index.html");
   }),
   b.add("all together", function () {
-    let _ = router.find("GET", "/user");
-    _ = router.find("GET", "/user/comments");
-    _ = router.find("GET", "/user/lookup/username/john");
-    _ = router.find("GET", "/event/abcd1234/comments");
-    _ = router.find("GET", "/very/deeply/nested/route/hello/there");
-    _ = router.find("GET", "/static/index.html");
+    let _ = router1.find("GET", "/user");
+    _ = router1.find("GET", "/user/comments");
+    _ = router1.find("GET", "/user/lookup/username/john");
+    _ = router1.find("GET", "/event/abcd1234/comments");
+    _ = router1.find("GET", "/very/deeply/nested/route/hello/there");
+    _ = router1.find("GET", "/static/index.html");
+  }),
+  b.cycle(),
+  b.complete(),
+);
+
+const router2 = Router();
+
+routes.forEach(function (route) {
+  router2.on(route.method, route.url, noop);
+});
+
+b.suite(
+  "find-my-way routes",
+  b.add("short static", function () {
+    const _ = router2.find("GET", "/user");
+  }),
+  b.add("static with some radix", function () {
+    const _ = router2.find("GET", "/user/comments");
+  }),
+  b.add("dynamic route", function () {
+    const _ = router2.find("GET", "/user/lookup/username/john");
+  }),
+  b.add("mixed static dynamic", function () {
+    const _ = router2.find("GET", "/event/abcd1234/comments");
+  }),
+  b.add("long static", function () {
+    const _ = router2.find("GET", "/very/deeply/nested/route/hello/there");
+  }),
+  b.add("wildcard", function () {
+    const _ = router2.find("GET", "/static/index.html");
+  }),
+  b.add("all together", function () {
+    let _ = router2.find("GET", "/user");
+    _ = router2.find("GET", "/user/comments");
+    _ = router2.find("GET", "/user/lookup/username/john");
+    _ = router2.find("GET", "/event/abcd1234/comments");
+    _ = router2.find("GET", "/very/deeply/nested/route/hello/there");
+    _ = router2.find("GET", "/static/index.html");
   }),
   b.cycle(),
   b.complete(),
