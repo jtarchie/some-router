@@ -11,6 +11,7 @@ interface Matcher {
 class PathRouter {
   routes: any = {};
   matchersByMinLength: any = {};
+  staticMatchers: any = {};
   matcherLengths: Array<number> = [];
 
   on(path: string, callback: any) {
@@ -33,6 +34,11 @@ class PathRouter {
       }
     }).join(`/`);
 
+    if (path === matcher) {
+      this.staticMatchers[path] = callback;
+      return;
+    }
+
     this.matchersByMinLength[minLength] ||= [];
     this.matchersByMinLength[minLength].push({
       regex: new RegExp(`^${matcher}$`),
@@ -45,13 +51,20 @@ class PathRouter {
   }
 
   find(path: string) {
+    const matched = this.staticMatchers[path];
+    if (matched) {
+      return matched;
+    }
+
     const maxLength = path.length;
 
     for (let i = this.matcherLengths.length; i >= 0; i--) {
       const length = this.matcherLengths[i];
+
       if (length <= maxLength) {
         for (let j = 0; j < this.matchersByMinLength[length].length; j++) {
           const matcher = this.matchersByMinLength[length][j];
+
           const matches = matcher.regex.exec(path);
           if (matches) {
             return matcher.callback;
