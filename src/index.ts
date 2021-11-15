@@ -132,7 +132,10 @@ class MethodRouter {
 }
 
 for (const method in methods) {
-  MethodRouter.prototype[method] = function (path: string, callback: any) {
+  MethodRouter.prototype[method.toLocaleLowerCase()] = function (
+    path: string,
+    callback: any,
+  ) {
     this.on(method, path, callback);
   };
 }

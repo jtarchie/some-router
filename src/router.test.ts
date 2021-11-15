@@ -129,7 +129,7 @@ describe("a router", function () {
     beforeEach(function () {
       router = new MethodRouter();
       for (const method in methods) {
-        router[method]("/", `${method} /`);
+        router[method.toLocaleLowerCase()]("/", `${method} /`);
       }
     });
 
