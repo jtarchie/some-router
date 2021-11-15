@@ -21,13 +21,13 @@ class PathRouter {
     const matcher = lookups.map(function (lookup, index) {
       if (lookup[0] === ":") {
         minLength += 1;
-        return `(?<${lookup.slice(1)}>\\w+)`;
+        return `(?<${lookup.slice(1)}>[\\w\\-]+)`;
       } else if (lookup === "*") {
         minLength += 1;
-        return `.*?`;
+        return `.+`;
       } else if (lookup[0] === "*") {
         minLength += 1;
-        return `(?<${lookup.slice(1)}>.*?)`;
+        return `(?<${lookup.slice(1)}>.+)`;
       } else {
         minLength += lookup.length;
         return lookup.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -53,7 +53,9 @@ class PathRouter {
   find(path: string) {
     const matched = this.staticMatchers[path];
     if (matched) {
-      return matched;
+      return {
+        callback: matched,
+      };
     }
 
     const maxLength = path.length;
@@ -67,7 +69,10 @@ class PathRouter {
 
           const matches = matcher.regex.exec(path);
           if (matches) {
-            return matcher.callback;
+            return {
+              params: matches.groups,
+              callback: matcher.callback,
+            };
           }
         }
       }

@@ -28,32 +28,35 @@ routes.forEach(function (route) {
 
 describe("when using the benchmark router", function () {
   it("returns a router", function () {
-    let route = router.find("GET", "/user");
-    expect(route).toEqual({ method: "GET", url: "/user" });
+    var { callback } = router.find("GET", "/user");
+    expect(callback).toEqual({ method: "GET", url: "/user" });
 
-    route = router.find("GET", "/user/comments");
-    expect(route).toEqual({ method: "GET", url: "/user/comments" });
+    var { callback } = router.find("GET", "/user/comments");
+    expect(callback).toEqual({ method: "GET", url: "/user/comments" });
 
-    route = router.find("GET", "/user/lookup/username/john");
-    expect(route).toEqual({
+    var { callback } = router.find("GET", "/user/lookup/username/john");
+    expect(callback).toEqual({
       method: "GET",
       url: "/user/lookup/username/:username",
     });
 
-    route = router.find("GET", "/event/abcd1234/comments");
-    expect(route).toEqual({
+    var { callback } = router.find("GET", "/event/abcd1234/comments");
+    expect(callback).toEqual({
       method: "GET",
       url: "/event/:id/comments",
     });
 
-    route = router.find("GET", "/very/deeply/nested/route/hello/there");
-    expect(route).toEqual({
+    var { callback } = router.find(
+      "GET",
+      "/very/deeply/nested/route/hello/there",
+    );
+    expect(callback).toEqual({
       method: "GET",
       url: "/very/deeply/nested/route/hello/there",
     });
 
-    route = router.find("GET", "/static/index.html");
-    expect(route).toEqual({
+    var { callback } = router.find("GET", "/static/index.html");
+    expect(callback).toEqual({
       method: "GET",
       url: "/static/*",
     });
@@ -66,10 +69,45 @@ describe("a router", function () {
     router.on(methods.GET, "/", "/");
     router.on(methods.GET, "/user", "/user");
 
-    let route = router.find("GET", "");
-    expect(route).toEqual("/");
+    var { callback } = router.find("GET", "");
+    expect(callback).toEqual("/");
 
-    route = router.find("GET", "user");
-    expect(route).toEqual("/user");
+    var { callback } = router.find("GET", "user");
+    expect(callback).toEqual("/user");
+  });
+
+  describe("when using splatting", function () {
+    it("supports named splats", function () {
+      const router = new MethodRouter();
+      router.on(methods.GET, "/*named", "named");
+
+      const { callback, params } = router.find("GET", "/an/entire/path");
+      expect(callback).toEqual("named");
+      expect(params).toEqual({ named: "an/entire/path" });
+    });
+
+    it("supports multiple named splats", function () {
+      const router = new MethodRouter();
+      router.on(methods.GET, "/*a/foo/*b", "named");
+
+      const { callback, params } = router.find("GET", "/zoo/woo/foo/bar/baz");
+      expect(callback).toEqual("named");
+      expect(params).toEqual({ a: "zoo/woo", b: "bar/baz" });
+    });
+
+    it("supports splats and params", function () {
+      const router = new MethodRouter();
+      router.on(methods.GET, "/books/*section/:title", "named");
+
+      const { callback, params } = router.find(
+        "GET",
+        "/books/some/section/last-words-a-memoir",
+      );
+      expect(callback).toEqual("named");
+      expect(params).toEqual({
+        section: "some/section",
+        title: "last-words-a-memoir",
+      });
+    });
   });
 });
