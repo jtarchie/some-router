@@ -1,18 +1,19 @@
-import { MethodRouter, methods } from ".";
+import { MethodRouter } from ".";
+import { METHODS } from "http";
 
 const routes = [
-  { method: methods.GET, url: "/user" },
-  { method: methods.GET, url: "/user/comments" },
-  { method: methods.GET, url: "/user/avatar" },
-  { method: methods.GET, url: "/user/lookup/username/:username" },
-  { method: methods.GET, url: "/user/lookup/email/:address" },
-  { method: methods.GET, url: "/event/:id" },
-  { method: methods.GET, url: "/event/:id/comments" },
-  { method: methods.POST, url: "/event/:id/comment" },
-  { method: methods.GET, url: "/map/:location/events" },
-  { method: methods.GET, url: "/status" },
-  { method: methods.GET, url: "/very/deeply/nested/route/hello/there" },
-  { method: methods.GET, url: "/static/*" },
+  { method: "GET", url: "/user" },
+  { method: "GET", url: "/user/comments" },
+  { method: "GET", url: "/user/avatar" },
+  { method: "GET", url: "/user/lookup/username/:username" },
+  { method: "GET", url: "/user/lookup/email/:address" },
+  { method: "GET", url: "/event/:id" },
+  { method: "GET", url: "/event/:id/comments" },
+  { method: "POST", url: "/event/:id/comment" },
+  { method: "GET", url: "/map/:location/events" },
+  { method: "GET", url: "/status" },
+  { method: "GET", url: "/very/deeply/nested/route/hello/there" },
+  { method: "GET", url: "/static/*" },
 ];
 
 const router = new MethodRouter();
@@ -66,8 +67,8 @@ describe("when using the benchmark router", function () {
 describe("a router", function () {
   it("defaults to matching with a leading slash", function () {
     const router = new MethodRouter();
-    router.on(methods.GET, "/", "/");
-    router.on(methods.GET, "/user", "/user");
+    router.on("GET", "/", "/");
+    router.on("GET", "/user", "/user");
 
     var { callback } = router.find("GET", "");
     expect(callback).toEqual("/");
@@ -79,7 +80,7 @@ describe("a router", function () {
   describe("when using splatting", function () {
     it("supports named splats", function () {
       const router = new MethodRouter();
-      router.on(methods.GET, "/*named", "named");
+      router.on("GET", "/*named", "named");
 
       const { callback, params } = router.find("GET", "/an/entire/path");
       expect(callback).toEqual("named");
@@ -88,7 +89,7 @@ describe("a router", function () {
 
     it("supports multiple named splats", function () {
       const router = new MethodRouter();
-      router.on(methods.GET, "/*a/foo/*b", "named");
+      router.on("GET", "/*a/foo/*b", "named");
 
       const { callback, params } = router.find("GET", "/zoo/woo/foo/bar/baz");
       expect(callback).toEqual("named");
@@ -97,7 +98,7 @@ describe("a router", function () {
 
     it("supports splats and params", function () {
       const router = new MethodRouter();
-      router.on(methods.GET, "/books/*section/:title", "named");
+      router.on("GET", "/books/*section/:title", "named");
 
       const { callback, params } = router.find(
         "GET",
@@ -113,8 +114,8 @@ describe("a router", function () {
 
   it("supports unicode characters", function () {
     const router = new MethodRouter();
-    router.on(methods.GET, "/*", "named");
-    router.on(methods.GET, "/こんにちは", "unicode");
+    router.on("GET", "/*", "named");
+    router.on("GET", "/こんにちは", "unicode");
 
     const { callback } = router.find(
       "GET",
@@ -128,16 +129,47 @@ describe("a router", function () {
 
     beforeEach(function () {
       router = new MethodRouter();
-      for (const method in methods) {
-        router[method.toLocaleLowerCase()]("/", `${method} /`);
-      }
+      router.acl("/", "ACL /");
+      router.bind("/", "BIND /");
+      router.checkout("/", "CHECKOUT /");
+      router.connect("/", "CONNECT /");
+      router.copy("/", "COPY /");
+      router.delete("/", "DELETE /");
+      router.get("/", "GET /");
+      router.head("/", "HEAD /");
+      router.link("/", "LINK /");
+      router.lock("/", "LOCK /");
+      router.msearch("/", "M-SEARCH /");
+      router.merge("/", "MERGE /");
+      router.mkactivity("/", "MKACTIVITY /");
+      router.mkcalendar("/", "MKCALENDAR /");
+      router.mkcol("/", "MKCOL /");
+      router.move("/", "MOVE /");
+      router.notify("/", "NOTIFY /");
+      router.options("/", "OPTIONS /");
+      router.patch("/", "PATCH /");
+      router.post("/", "POST /");
+      router.propfind("/", "PROPFIND /");
+      router.proppatch("/", "PROPPATCH /");
+      router.purge("/", "PURGE /");
+      router.put("/", "PUT /");
+      router.rebind("/", "REBIND /");
+      router.report("/", "REPORT /");
+      router.search("/", "SEARCH /");
+      router.source("/", "SOURCE /");
+      router.subscribe("/", "SUBSCRIBE /");
+      router.trace("/", "TRACE /");
+      router.unbind("/", "UNBIND /");
+      router.unlink("/", "UNLINK /");
+      router.unlock("/", "UNLOCK /");
+      router.unsubscribe("/", "UNSUBSCRIBE /");
     });
 
-    for (const method in methods) {
+    METHODS.forEach(function (method) {
       it(`supports ${method}`, function () {
         const { callback } = router.find(method, "/");
         expect(callback).toEqual(`${method} /`);
       });
-    }
+    });
   });
 });

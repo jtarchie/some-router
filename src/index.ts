@@ -1,40 +1,3 @@
-enum methods {
-  ACL = "ACL",
-  BIND = "BIND",
-  CHECKOUT = "CHECKOUT",
-  CONNECT = "CONNECT",
-  COPY = "COPY",
-  DELETE = "DELETE",
-  GET = "GET",
-  HEAD = "HEAD",
-  LINK = "LINK",
-  LOCK = "LOCK",
-  M = "M-SEARCH",
-  MERGE = "MERGE",
-  MKACTIVITY = "MKACTIVITY",
-  MKCALENDAR = "MKCALENDAR",
-  MKCOL = "MKCOL",
-  MOVE = "MOVE",
-  NOTIFY = "NOTIFY",
-  OPTIONS = "OPTIONS",
-  PATCH = "PATCH",
-  POST = "POST",
-  PROPFIND = "PROPFIND",
-  PROPPATCH = "PROPPATCH",
-  PURGE = "PURGE",
-  PUT = "PUT",
-  REBIND = "REBIND",
-  REPORT = "REPORT",
-  SEARCH = "SEARCH",
-  SOURCE = "SOURCE",
-  SUBSCRIBE = "SUBSCRIBE",
-  TRACE = "TRACE",
-  UNBIND = "UNBIND",
-  UNLINK = "UNLINK",
-  UNLOCK = "UNLOCK",
-  UNSUBSCRIBE = "UNSUBSCRIBE",
-}
-
 interface Matcher {
   regex: RegExp;
   callback: any;
@@ -115,7 +78,7 @@ class PathRouter {
 class MethodRouter {
   routes: any = {};
 
-  on(method: methods, path: string, callback: any) {
+  on(method: string, path: string, callback: any) {
     this.routes[method] ||= new PathRouter();
     this.routes[method].on(path, callback);
   }
@@ -129,16 +92,110 @@ class MethodRouter {
       return pathRouter.find(path);
     }
   }
-}
 
-for (const method in methods) {
-  MethodRouter.prototype[method.toLocaleLowerCase()] = function (
-    path: string,
-    callback: any,
-  ) {
-    this.on(method, path, callback);
-  };
+  acl(path: string, callback: any) {
+    this.on("ACL", path, callback);
+  }
+  bind(path: string, callback: any) {
+    this.on("BIND", path, callback);
+  }
+  checkout(path: string, callback: any) {
+    this.on("CHECKOUT", path, callback);
+  }
+  connect(path: string, callback: any) {
+    this.on("CONNECT", path, callback);
+  }
+  copy(path: string, callback: any) {
+    this.on("COPY", path, callback);
+  }
+  delete(path: string, callback: any) {
+    this.on("DELETE", path, callback);
+  }
+  get(path: string, callback: any) {
+    this.on("GET", path, callback);
+  }
+  head(path: string, callback: any) {
+    this.on("HEAD", path, callback);
+  }
+  link(path: string, callback: any) {
+    this.on("LINK", path, callback);
+  }
+  lock(path: string, callback: any) {
+    this.on("LOCK", path, callback);
+  }
+  msearch(path: string, callback: any) {
+    this.on("M-SEARCH", path, callback);
+  }
+  merge(path: string, callback: any) {
+    this.on("MERGE", path, callback);
+  }
+  mkactivity(path: string, callback: any) {
+    this.on("MKACTIVITY", path, callback);
+  }
+  mkcalendar(path: string, callback: any) {
+    this.on("MKCALENDAR", path, callback);
+  }
+  mkcol(path: string, callback: any) {
+    this.on("MKCOL", path, callback);
+  }
+  move(path: string, callback: any) {
+    this.on("MOVE", path, callback);
+  }
+  notify(path: string, callback: any) {
+    this.on("NOTIFY", path, callback);
+  }
+  options(path: string, callback: any) {
+    this.on("OPTIONS", path, callback);
+  }
+  patch(path: string, callback: any) {
+    this.on("PATCH", path, callback);
+  }
+  post(path: string, callback: any) {
+    this.on("POST", path, callback);
+  }
+  propfind(path: string, callback: any) {
+    this.on("PROPFIND", path, callback);
+  }
+  proppatch(path: string, callback: any) {
+    this.on("PROPPATCH", path, callback);
+  }
+  purge(path: string, callback: any) {
+    this.on("PURGE", path, callback);
+  }
+  put(path: string, callback: any) {
+    this.on("PUT", path, callback);
+  }
+  rebind(path: string, callback: any) {
+    this.on("REBIND", path, callback);
+  }
+  report(path: string, callback: any) {
+    this.on("REPORT", path, callback);
+  }
+  search(path: string, callback: any) {
+    this.on("SEARCH", path, callback);
+  }
+  source(path: string, callback: any) {
+    this.on("SOURCE", path, callback);
+  }
+  subscribe(path: string, callback: any) {
+    this.on("SUBSCRIBE", path, callback);
+  }
+  trace(path: string, callback: any) {
+    this.on("TRACE", path, callback);
+  }
+  unbind(path: string, callback: any) {
+    this.on("UNBIND", path, callback);
+  }
+  unlink(path: string, callback: any) {
+    this.on("UNLINK", path, callback);
+  }
+  unlock(path: string, callback: any) {
+    this.on("UNLOCK", path, callback);
+  }
+  unsubscribe(path: string, callback: any) {
+    this.on("UNSUBSCRIBE", path, callback);
+  }
 }
 
 export default MethodRouter;
-export { MethodRouter, methods };
+export { MethodRouter };

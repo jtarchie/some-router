@@ -1,20 +1,20 @@
 import b from "benny";
-import { MethodRouter, methods } from ".";
-import Router from "find-my-way";
+import { MethodRouter } from ".";
+import Router, { HTTPMethod } from "find-my-way";
 
 const routes = [
-  { method: methods.GET, url: "/user" },
-  { method: methods.GET, url: "/user/comments" },
-  { method: methods.GET, url: "/user/avatar" },
-  { method: methods.GET, url: "/user/lookup/username/:username" },
-  { method: methods.GET, url: "/user/lookup/email/:address" },
-  { method: methods.GET, url: "/event/:id" },
-  { method: methods.GET, url: "/event/:id/comments" },
-  { method: methods.POST, url: "/event/:id/comment" },
-  { method: methods.GET, url: "/map/:location/events" },
-  { method: methods.GET, url: "/status" },
-  { method: methods.GET, url: "/very/deeply/nested/route/hello/there" },
-  { method: methods.GET, url: "/static/*" },
+  { method: "GET", url: "/user" },
+  { method: "GET", url: "/user/comments" },
+  { method: "GET", url: "/user/avatar" },
+  { method: "GET", url: "/user/lookup/username/:username" },
+  { method: "GET", url: "/user/lookup/email/:address" },
+  { method: "GET", url: "/event/:id" },
+  { method: "GET", url: "/event/:id/comments" },
+  { method: "POST", url: "/event/:id/comment" },
+  { method: "GET", url: "/map/:location/events" },
+  { method: "GET", url: "/status" },
+  { method: "GET", url: "/very/deeply/nested/route/hello/there" },
+  { method: "GET", url: "/static/*" },
 ];
 
 function noop() {}
@@ -60,7 +60,7 @@ b.suite(
 const router2 = Router();
 
 routes.forEach(function (route) {
-  router2.on(route.method, route.url, noop);
+  router2.on(route.method as HTTPMethod, route.url, noop);
 });
 
 b.suite(

@@ -5,10 +5,11 @@
   "main": "dist/index.js",
   "license": "MIT",
   "devDependencies": {
+    "@swc/core": "^1.2.108",
+    "@swc/jest": "^0.2.5",
     "@types/jest": "^27.0.2",
     "benny": "^3.7.1",
     "esbuild": "^0.13.13",
-    "esbuild-jest": "^0.5.0",
     "find-my-way": "^5.0.0",
     "jest": "^27.3.1",
     "ts-node": "^10.4.0",
@@ -16,19 +17,14 @@
   },
   "scripts": {
     "bench": "ts-node src/benchmark.ts",
-    "build": "npx esbuild --platform=node --minify --outfile=dist/index.js --bundle --sourcemap=external src/index.ts",
+    "build": "npx esbuild --platform=node --outfile=dist/index.js --bundle --sourcemap=external src/index.ts",
     "fmt": "deno fmt src/",
     "lint": "deno lint --rules-tags=recommendation src/",
     "test": "yarn run lint && yarn run fmt && npx jest"
   },
   "jest": {
     "transform": {
-      "^.+\\.[jt]sx?$": [
-        "esbuild-jest",
-        {
-          "sourcemap": true
-        }
-      ]
+      "^.+\\.(t|j)sx?$": "@swc/jest"
     }
   }
 }
