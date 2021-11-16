@@ -121,7 +121,8 @@ describe("a router", function () {
       );
       expect(callback).toEqual("anonymous");
       expect(params).toEqual({
-        splats: ["hello", "world"],
+        splat0: "hello",
+        splat1: "world",
       });
     });
 
@@ -135,7 +136,7 @@ describe("a router", function () {
       );
       expect(callback).toEqual("anonymous");
       expect(params).toEqual({
-        splats: ["world"],
+        splat0: "world",
         a: "hello",
       });
     });

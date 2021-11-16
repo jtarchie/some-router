@@ -79,22 +79,10 @@ class PathRouter {
 
           const matches = matcher.regex.exec(path);
           if (matches) {
-            if (matcher.splatCount > 0) {
-              let splats = [];
-              for (let i = 0; i < matcher.splatCount; i++) {
-                splats.push(matches.groups[`splat${i}`]);
-                delete matches.groups[`splat${i}`];
-              }
-              return {
-                params: { ...matches.groups, splats },
-                callback: matcher.callback,
-              };
-            } else {
-              return {
-                params: matches.groups,
-                callback: matcher.callback,
-              };
-            }
+            return {
+              params: matches.groups,
+              callback: matcher.callback,
+            };
           }
         }
       }
