@@ -170,6 +170,20 @@ describe("a router", function () {
         name: "こんにちは",
       });
     });
+
+    it("allows globs to use unicode", function () {
+      const router = new MethodRouter();
+      router.on("GET", "/profile/*name", "unicode");
+
+      const { callback, params } = router.find(
+        "GET",
+        "/profile/こんにちは",
+      );
+      expect(callback).toEqual("unicode");
+      expect(params).toEqual({
+        name: "こんにちは",
+      });
+    });
   });
 
   describe("with all supported HTTP methods", function () {
