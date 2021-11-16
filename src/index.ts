@@ -3,16 +3,25 @@ interface Matcher {
   callback: any;
 }
 
+interface Route {
+  regex: RegExp;
+  callback: any;
+  splatCount: number;
+  path: string;
+  minLength: number;
+}
+
 class PathRouter {
-  routes: any = {};
-  matchersByMinLength: any = {};
-  staticMatchers: any = {};
-  matcherLengths: Array<number> = [];
+  routes: Array<Route> = [];
+  matcherByMinPrefix: Map<string, Array<Route>> = new Map();
+  staticMatchers: Map<string, Route> = new Map();
+  minPrefixLength: number = Infinity;
 
   on(path: string, callback: any) {
     let parts = [];
-    let minLength = 0;
+    let minPrefixLength = 0;
     let splatCount = 0;
+    let minLength = 0;
 
     for (let i = 0; i < path.length;) {
       let startingPos = i;
@@ -22,13 +31,17 @@ class PathRouter {
           path.slice(startingPos, i).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
         );
         minLength += i - startingPos;
+
+        if (minPrefixLength === 0) {
+          minPrefixLength = i - startingPos;
+        }
       }
 
       if (path[i] === ":") {
         startingPos = ++i;
         for (; i < path.length && /\w/.test(path[i]); i++);
         parts.push(`(?<${path.slice(startingPos, i)}>[^\.]+)`);
-        minLength += 1;
+        minLength++;
       } else if (path[i] === "*") {
         startingPos = ++i;
         for (; i < path.length && /\w/.test(path[i]); i++);
@@ -38,58 +51,67 @@ class PathRouter {
           parts.push(`(?<splat${splatCount}>.+)`);
           splatCount++;
         }
-        minLength += 1;
+        minLength++;
       }
     }
 
     const matcher = parts.join("");
-    if (path === matcher) {
-      this.staticMatchers[path] = callback;
-      return;
-    }
-
-    this.matchersByMinLength[minLength] ||= [];
-    this.matchersByMinLength[minLength].push({
+    const route = {
       regex: new RegExp(`^${matcher}$`),
       callback: callback,
       splatCount: splatCount,
-    });
+      path: path,
+      minLength: minLength,
+    };
 
-    this.matcherLengths = Object.keys(this.matchersByMinLength).map((a) =>
-      Number(a)
-    ).sort((a, b) => a - b);
+    if (path === matcher) {
+      this.staticMatchers.set(path, route);
+      return;
+    }
+
+    this.routes.push(route);
+
+    if (this.minPrefixLength > minPrefixLength) {
+      this.minPrefixLength = minPrefixLength;
+    }
+
+    this.matcherByMinPrefix = new Map();
+    let $self = this;
+
+    this.routes.forEach(function (route) {
+      const prefix = route.path.slice(0, $self.minPrefixLength);
+      const routes = $self.matcherByMinPrefix.get(prefix) || [];
+      routes.push(route);
+      routes.sort((a, b) => b.minLength - a.minLength);
+      $self.matcherByMinPrefix.set(prefix, routes);
+    });
   }
 
   find(path: string) {
-    const matched = this.staticMatchers[path];
+    const matched = this.staticMatchers.get(path);
     if (matched) {
       return {
-        callback: matched,
+        callback: matched.callback,
       };
     }
 
-    const maxLength = path.length;
+    const prefix = path.substring(0, this.minPrefixLength);
+    const matchers = this.matcherByMinPrefix.get(prefix);
+    if (matchers) {
+      for (let i = 0; i < matchers.length; i++) {
+        const matcher = matchers[i];
 
-    for (let i = this.matcherLengths.length; i >= 0; i--) {
-      const length = this.matcherLengths[i];
-
-      if (length <= maxLength) {
-        for (let j = 0; j < this.matchersByMinLength[length].length; j++) {
-          const matcher = this.matchersByMinLength[length][j];
-
-          const matches = matcher.regex.exec(path);
-          if (matches) {
-            return {
-              params: matches.groups,
-              callback: matcher.callback,
-            };
-          }
+        const matches = matcher.regex.exec(path);
+        if (matches) {
+          return {
+            params: matches.groups,
+            callback: matcher.callback,
+          };
         }
       }
     }
   }
 }
-
 class MethodRouter {
   routes: any = {};
 
