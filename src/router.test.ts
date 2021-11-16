@@ -171,7 +171,7 @@ describe("a router", function () {
       });
     });
 
-    it("allows globs to use unicode", function () {
+    it("allows splats to use unicode", function () {
       const router = new MethodRouter();
       router.on("GET", "/profile/*name", "unicode");
 
