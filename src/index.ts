@@ -12,6 +12,7 @@ class PathRouter {
   on(path: string, callback: any) {
     let parts = [];
     let minLength = 0;
+    let splatCount = 0;
 
     for (let i = 0; i < path.length;) {
       let startingPos = i;
@@ -34,7 +35,8 @@ class PathRouter {
         if (startingPos < i) {
           parts.push(`(?<${path.slice(startingPos, i)}>.+)`);
         } else {
-          parts.push(`.+`);
+          parts.push(`(?<splat${splatCount}>.+)`);
+          splatCount++;
         }
         minLength += 1;
       }
@@ -50,6 +52,7 @@ class PathRouter {
     this.matchersByMinLength[minLength].push({
       regex: new RegExp(`^${matcher}$`),
       callback: callback,
+      splatCount: splatCount,
     });
 
     this.matcherLengths = Object.keys(this.matchersByMinLength).map((a) =>
@@ -76,10 +79,22 @@ class PathRouter {
 
           const matches = matcher.regex.exec(path);
           if (matches) {
-            return {
-              params: matches.groups,
-              callback: matcher.callback,
-            };
+            if (matcher.splatCount > 0) {
+              let splats = [];
+              for (let i = 0; i < matcher.splatCount; i++) {
+                splats.push(matches.groups[`splat${i}`]);
+                delete matches.groups[`splat${i}`];
+              }
+              return {
+                params: { ...matches.groups, splats },
+                callback: matcher.callback,
+              };
+            } else {
+              return {
+                params: matches.groups,
+                callback: matcher.callback,
+              };
+            }
           }
         }
       }

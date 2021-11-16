@@ -110,6 +110,35 @@ describe("a router", function () {
         title: "last-words-a-memoir",
       });
     });
+
+    it("returns 'splats' for anonymous splats", function () {
+      const router = new MethodRouter();
+      router.on("GET", "/say/*/to/*", "anonymous");
+
+      const { callback, params } = router.find(
+        "GET",
+        "/say/hello/to/world",
+      );
+      expect(callback).toEqual("anonymous");
+      expect(params).toEqual({
+        splats: ["hello", "world"],
+      });
+    });
+
+    it("returns anonymous and named splats", function () {
+      const router = new MethodRouter();
+      router.on("GET", "/say/*a/to/*", "anonymous");
+
+      const { callback, params } = router.find(
+        "GET",
+        "/say/hello/to/world",
+      );
+      expect(callback).toEqual("anonymous");
+      expect(params).toEqual({
+        splats: ["world"],
+        a: "hello",
+      });
+    });
   });
 
   describe("when using params", function () {
