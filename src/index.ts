@@ -3,7 +3,7 @@ interface Matcher {
   callback: any;
 }
 
-interface Route {
+interface PathRoute {
   regex: RegExp;
   callback: any;
   splatCount: number;
@@ -12,9 +12,9 @@ interface Route {
 }
 
 class PathRouter {
-  routes: Array<Route> = [];
-  matcherByMinPrefix: Map<string, Array<Route>> = new Map();
-  staticMatchers: Map<string, Route> = new Map();
+  routes: Array<PathRoute> = [];
+  matcherByMinPrefix: Map<string, Array<PathRoute>> = new Map();
+  staticMatchers: Map<string, PathRoute> = new Map();
   minPrefixLength: number = Infinity;
 
   on(path: string, callback: any) {
@@ -112,16 +112,18 @@ class PathRouter {
     }
   }
 }
+
 class MethodRouter {
-  routes: any = {};
+  routes: Map<string, PathRouter> = new Map();
 
   on(method: string, path: string, callback: any) {
-    this.routes[method] ||= new PathRouter();
-    this.routes[method].on(path, callback);
+    const route = this.routes.get(method) || new PathRouter();
+    route.on(path, callback);
+    this.routes.set(method, route);
   }
 
   find(method: string, path: string) {
-    const pathRouter = this.routes[method];
+    const pathRouter = this.routes.get(method);
     if (pathRouter) {
       if (path[0] !== "/") {
         path = "/" + path;
