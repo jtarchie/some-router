@@ -127,18 +127,49 @@ describe("a router", function () {
         surname: "doe",
       });
     });
+
+    it("can read nested params for a file extension", function () {
+      const router = new MethodRouter();
+      router.on("GET", "/profile/:id.:format", "params");
+
+      const { callback, params } = router.find(
+        "GET",
+        "/profile/123.jpeg",
+      );
+      expect(callback).toEqual("params");
+      expect(params).toEqual({
+        id: "123",
+        format: "jpeg",
+      });
+    });
   });
 
-  it("supports unicode characters", function () {
-    const router = new MethodRouter();
-    router.on("GET", "/*", "named");
-    router.on("GET", "/こんにちは", "unicode");
+  describe("when using routes with unicode", function () {
+    it("specific routes have precedence", function () {
+      const router = new MethodRouter();
+      router.on("GET", "/*", "named");
+      router.on("GET", "/こんにちは", "unicode");
 
-    const { callback } = router.find(
-      "GET",
-      "こんにちは",
-    );
-    expect(callback).toEqual("unicode");
+      const { callback } = router.find(
+        "GET",
+        "こんにちは",
+      );
+      expect(callback).toEqual("unicode");
+    });
+
+    it("allows params to use unicode", function () {
+      const router = new MethodRouter();
+      router.on("GET", "/profile/:name", "unicode");
+
+      const { callback, params } = router.find(
+        "GET",
+        "/profile/こんにちは",
+      );
+      expect(callback).toEqual("unicode");
+      expect(params).toEqual({
+        name: "こんにちは",
+      });
+    });
   });
 
   describe("with all supported HTTP methods", function () {

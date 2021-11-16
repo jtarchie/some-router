@@ -26,7 +26,7 @@ class PathRouter {
       if (path[i] === ":") {
         startingPos = ++i;
         for (; i < path.length && /\w/.test(path[i]); i++);
-        parts.push(`(?<${path.slice(startingPos, i)}>[\\w\-]+)`);
+        parts.push(`(?<${path.slice(startingPos, i)}>[^\.]+)`);
         minLength += 1;
       } else if (path[i] === "*") {
         startingPos = ++i;
