@@ -10,25 +10,37 @@ class PathRouter {
   matcherLengths: Array<number> = [];
 
   on(path: string, callback: any) {
-    const lookups = path.split(/(?=:\w+)|\/|(?=\*\w*)/);
-
+    let parts = [];
     let minLength = 0;
-    const matcher = lookups.map(function (lookup, index) {
-      if (lookup[0] === ":") {
-        minLength += 1;
-        return `(?<${lookup.slice(1)}>[\\w\\-]+)`;
-      } else if (lookup === "*") {
-        minLength += 1;
-        return `.+`;
-      } else if (lookup[0] === "*") {
-        minLength += 1;
-        return `(?<${lookup.slice(1)}>.+)`;
-      } else {
-        minLength += lookup.length;
-        return lookup.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      }
-    }).join(`/`);
 
+    for (let i = 0; i < path.length;) {
+      let startingPos = i;
+      for (; i < path.length && !/(:|\*)/.test(path[i]); i++);
+      if (startingPos < i) {
+        parts.push(
+          path.slice(startingPos, i).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+        );
+        minLength += i - startingPos;
+      }
+
+      if (path[i] === ":") {
+        startingPos = ++i;
+        for (; i < path.length && /\w/.test(path[i]); i++);
+        parts.push(`(?<${path.slice(startingPos, i)}>[\\w\-]+)`);
+        minLength += 1;
+      } else if (path[i] === "*") {
+        startingPos = ++i;
+        for (; i < path.length && /\w/.test(path[i]); i++);
+        if (startingPos < i) {
+          parts.push(`(?<${path.slice(startingPos, i)}>.+)`);
+        } else {
+          parts.push(`.+`);
+        }
+        minLength += 1;
+      }
+    }
+
+    const matcher = parts.join("");
     if (path === matcher) {
       this.staticMatchers[path] = callback;
       return;

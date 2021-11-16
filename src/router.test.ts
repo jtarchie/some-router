@@ -112,6 +112,23 @@ describe("a router", function () {
     });
   });
 
+  describe("when using params", function () {
+    it("uses the shortest distance to match", function () {
+      const router = new MethodRouter();
+      router.on("GET", "/customer/:name-:surname", "params");
+
+      const { callback, params } = router.find(
+        "GET",
+        "/customer/john-doe",
+      );
+      expect(callback).toEqual("params");
+      expect(params).toEqual({
+        name: "john",
+        surname: "doe",
+      });
+    });
+  });
+
   it("supports unicode characters", function () {
     const router = new MethodRouter();
     router.on("GET", "/*", "named");
