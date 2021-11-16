@@ -22,10 +22,11 @@ class PathRouter {
     let minPrefixLength = 0;
     let splatCount = 0;
     let minLength = 0;
+    let isStatic = true;
 
     for (let i = 0; i < path.length;) {
       let startingPos = i;
-      for (; i < path.length && !/(:|\*)/.test(path[i]); i++);
+      for (; i < path.length && !/[:*(]/.test(path[i]); i++);
       if (startingPos < i) {
         parts.push(
           path.slice(startingPos, i).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
@@ -37,21 +38,54 @@ class PathRouter {
         }
       }
 
-      if (path[i] === ":") {
-        startingPos = ++i;
-        for (; i < path.length && /\w/.test(path[i]); i++);
-        parts.push(`(?<${path.slice(startingPos, i)}>[^\.]+)`);
-        minLength++;
-      } else if (path[i] === "*") {
-        startingPos = ++i;
-        for (; i < path.length && /\w/.test(path[i]); i++);
-        if (startingPos < i) {
-          parts.push(`(?<${path.slice(startingPos, i)}>.+)`);
-        } else {
-          parts.push(`(?<splat${splatCount}>.+)`);
-          splatCount++;
+      switch (path[i]) {
+        case ":": {
+          startingPos = ++i;
+          for (; i < path.length && /\w/.test(path[i]); i++);
+          parts.push(`(?<${path.slice(startingPos, i)}>[^\.]+)`);
+          minLength++;
+          isStatic = false;
+          break;
         }
-        minLength++;
+        case "*": {
+          startingPos = ++i;
+          for (; i < path.length && /\w/.test(path[i]); i++);
+          if (startingPos < i) {
+            parts.push(`(?<${path.slice(startingPos, i)}>.+)`);
+          } else {
+            parts.push(`(?<splat${splatCount}>.+)`);
+            splatCount++;
+          }
+          minLength++;
+          isStatic = false;
+          break;
+        }
+        case "(": {
+          startingPos = i;
+          let count = 0;
+          for (; i < path.length || count > 0; i++) {
+            switch (path[i]) {
+              case "(": {
+                count++;
+                break;
+              }
+              case ")": {
+                count--;
+                break;
+              }
+            }
+          }
+
+          if (count === 0) {
+            parts.push(path.slice(startingPos, i));
+            minLength++; // take a guess
+            isStatic = false;
+          } else {
+            parts.push("\\(");
+            startingPos = i + 1;
+          }
+          break;
+        }
       }
     }
 
@@ -64,7 +98,7 @@ class PathRouter {
       minLength: minLength,
     };
 
-    if (path === matcher) {
+    if (isStatic) {
       this.staticMatchers.set(path, route);
       return;
     }

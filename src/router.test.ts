@@ -216,6 +216,24 @@ describe("a router", function () {
     });
   });
 
+  describe("when using regexes", function () {
+    it("allows named captured groups", function () {
+      const router = new MethodRouter();
+      router.on("GET", `/customer/(?<name>\\w+)-(?<surname>\\w+)`, "regex");
+      console.log(router.routes.get("GET"));
+
+      const { callback, params } = router.find(
+        "GET",
+        "/customer/john-doe",
+      );
+      expect(callback).toEqual("regex");
+      expect(params).toEqual({
+        name: "john",
+        surname: "doe",
+      });
+    });
+  });
+
   describe("with all supported HTTP methods", function () {
     let router: MethodRouter;
 
