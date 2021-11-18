@@ -1,14 +1,26 @@
-interface Matcher {
-  regex: RegExp;
+class PathRoute {
   callback: any;
-}
-
-interface PathRoute {
-  regex: RegExp;
-  callback: any;
-  splatCount: number;
-  path: string;
   minLength: number;
+  path: string;
+  regex: RegExp;
+  regexCount: number;
+  splatCount: number;
+
+  constructor(
+    callback: any,
+    minLength: number,
+    path: string,
+    regex: RegExp,
+    regexCount: number,
+    splatCount: number,
+  ) {
+    this.callback = callback;
+    this.minLength = minLength;
+    this.path = path;
+    this.regex = regex;
+    this.regexCount = regexCount;
+    this.splatCount = splatCount;
+  }
 }
 
 class PathRouter {
@@ -98,14 +110,14 @@ class PathRouter {
     }
 
     const matcher = parts.join("");
-    const route = {
-      callback: callback,
-      minLength: minLength,
-      path: path,
-      regex: new RegExp(`^${matcher}$`),
-      regexCount: regexCount,
-      splatCount: splatCount,
-    };
+    const route = new PathRoute(
+      callback,
+      minLength,
+      path,
+      new RegExp(`^${matcher}$`),
+      regexCount,
+      splatCount,
+    );
 
     if (isStatic) {
       this.staticMatchers.set(path, route);
