@@ -19,14 +19,34 @@ const routes = [
 
 function noop() {}
 
-const router1 = new MethodRouter();
+function createSomeRouter() {
+  const router = new MethodRouter();
 
-routes.forEach(function (route) {
-  router1.on(route.method, route.url, noop);
-});
+  routes.forEach(function (route) {
+    router.on(route.method, route.url, noop);
+  });
+
+  return router;
+}
+
+function createFindMyWay() {
+  const router = Router();
+
+  routes.forEach(function (route) {
+    router.on(route.method as HTTPMethod, route.url, noop);
+  });
+
+  return router;
+}
+
+const router1 = createSomeRouter();
+const router2 = createFindMyWay();
 
 b.suite(
   "some-router routes",
+  b.add("setting routes", function () {
+    const _ = createSomeRouter();
+  }),
   b.add("short static", function () {
     const _ = router1.find("GET", "/user");
   }),
@@ -57,14 +77,11 @@ b.suite(
   b.complete(),
 );
 
-const router2 = Router();
-
-routes.forEach(function (route) {
-  router2.on(route.method as HTTPMethod, route.url, noop);
-});
-
 b.suite(
   "find-my-way routes",
+  b.add("setting routes", function () {
+    const _ = createFindMyWay();
+  }),
   b.add("short static", function () {
     const _ = router2.find("GET", "/user");
   }),
