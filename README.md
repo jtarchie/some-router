@@ -9,12 +9,34 @@ It does not invoke the handler, just returns it.
 import {MethodRouter} from 'some-router';
 
 const router = new MethodRouter();
-router.get('/', function() { console.log('/')});
-router.get('/a', function() { console.log('/a')});
+router.get('/', function() { return('/')});
+router.get('/a', function() { return('/a')});
 
 const { callback } = router.find('/');
-callback();
-// stdout: /
+console.assert(callback() == "/");
+```
+
+When defining routes, the order of declaration does not matter.
+The evaluation of routes affects the order.
+
+Listed in order of precedence:
+* exact match of a static route
+```javascript
+const router = new MethodRouter()
+router.get('/a', function() { return('static')});
+router.get('/(\w+)', function() { return('dynamic')});
+
+const { callback } = router.find('/a')
+console.assert(callback() == "static");
+```
+* longest matching route based on minimize size of matcher
+```javascript
+const router = new MethodRouter()
+router.get('/:first-:second', ()=>{});
+router.get('/:first', ()=>{});
+
+const { params } = router.find('/a-b')
+console.assert(params == {'first': 'a', 'second': 'b'});
 ```
 
 ## Development

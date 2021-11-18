@@ -182,7 +182,7 @@ describe("a router", function () {
 
       const { callback } = router.find(
         "GET",
-        "こんにちは",
+        "/こんにちは",
       );
       expect(callback).toEqual("unicode");
     });
@@ -230,6 +230,21 @@ describe("a router", function () {
       expect(params).toEqual({
         name: "john",
         surname: "doe",
+      });
+    });
+
+    it("returns 'capture' for anonymous regexes", function () {
+      const router = new MethodRouter();
+      router.on("GET", `/customer/(\\w+)-(\\w+)`, "regex");
+
+      const { callback, params } = router.find(
+        "GET",
+        "/customer/john-doe",
+      );
+      expect(callback).toEqual("regex");
+      expect(params).toEqual({
+        regex0: "john",
+        regex1: "doe",
       });
     });
   });

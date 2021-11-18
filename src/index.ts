@@ -21,6 +21,7 @@ class PathRouter {
     let parts = [];
     let minPrefixLength = 0;
     let splatCount = 0;
+    let regexCount = 0;
     let minLength = 0;
     let isStatic = true;
 
@@ -61,9 +62,9 @@ class PathRouter {
           break;
         }
         case "(": {
-          startingPos = i;
-          let count = 0;
-          for (; i < path.length || count > 0; i++) {
+          startingPos = i++;
+          let count = 1;
+          for (; 0 < count && i < path.length; i++) {
             switch (path[i]) {
               case "(": {
                 count++;
@@ -77,12 +78,19 @@ class PathRouter {
           }
 
           if (count === 0) {
-            parts.push(path.slice(startingPos, i));
+            if (path.slice(startingPos).startsWith("(?<")) {
+              parts.push(path.slice(startingPos, i));
+            } else {
+              parts.push(
+                `(?<regex${regexCount}>` + path.slice(startingPos, i) + ")",
+              );
+              regexCount++;
+            }
+
             minLength++; // take a guess
             isStatic = false;
           } else {
             parts.push("\\(");
-            startingPos = i + 1;
           }
           break;
         }
@@ -91,11 +99,12 @@ class PathRouter {
 
     const matcher = parts.join("");
     const route = {
-      regex: new RegExp(`^${matcher}$`),
       callback: callback,
-      splatCount: splatCount,
-      path: path,
       minLength: minLength,
+      path: path,
+      regex: new RegExp(`^${matcher}$`),
+      regexCount: regexCount,
+      splatCount: splatCount,
     };
 
     if (isStatic) {
