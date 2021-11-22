@@ -125,6 +125,7 @@ class PathRouter {
     }
 
     this.routes.push(route);
+    this.routes.sort((a, b) => b.minLength - a.minLength);
 
     if (this.minPrefixLength > minPrefixLength) {
       this.minPrefixLength = minPrefixLength;
@@ -137,7 +138,6 @@ class PathRouter {
       const prefix = route.path.slice(0, $self.minPrefixLength);
       const routes = $self.matcherByMinPrefix.get(prefix) || [];
       routes.push(route);
-      routes.sort((a, b) => b.minLength - a.minLength);
       $self.matcherByMinPrefix.set(prefix, routes);
     });
   }
