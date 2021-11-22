@@ -18,7 +18,7 @@
   "scripts": {
     "bench": "ts-node src/benchmark.ts",
     "build": "npx esbuild --platform=node --outfile=dist/index.js --bundle --sourcemap=external src/index.ts",
-    "fmt": "deno fmt src/",
+    "fmt": "deno fmt src/ *.md",
     "lint": "deno lint --rules-tags=recommendation src/",
     "test": "yarn run lint && yarn run fmt && npx jest"
   },
