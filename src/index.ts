@@ -1,26 +1,12 @@
 class PathRoute {
-  callback: any;
-  minLength: number;
-  path: string;
-  regex: RegExp;
-  regexCount: number;
-  splatCount: number;
-
   constructor(
-    callback: any,
-    minLength: number,
-    path: string,
-    regex: RegExp,
-    regexCount: number,
-    splatCount: number,
-  ) {
-    this.callback = callback;
-    this.minLength = minLength;
-    this.path = path;
-    this.regex = regex;
-    this.regexCount = regexCount;
-    this.splatCount = splatCount;
-  }
+    public callback: any,
+    public minLength: number,
+    public path: string,
+    public regex: RegExp,
+    public regexCount: number,
+    public splatCount: number,
+  ) {}
 }
 
 class PathRouter {
