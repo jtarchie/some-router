@@ -220,7 +220,6 @@ describe("a router", function () {
     it("allows named captured groups", function () {
       const router = new MethodRouter();
       router.on("GET", `/customer/(?<name>\\w+)-(?<surname>\\w+)`, "regex");
-      console.log(router.routes.get("GET"));
 
       const { callback, params } = router.find(
         "GET",
