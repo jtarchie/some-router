@@ -9,10 +9,18 @@ class PathRoute {
   ) {}
 }
 
+type mapMatchByMinPrefix = {
+  [key: string]: Array<PathRoute>;
+};
+
+type mapStaticMatchers = {
+  [key: string]: PathRoute;
+};
+
 class PathRouter {
   routes: Array<PathRoute> = [];
-  matcherByMinPrefix: Map<string, Array<PathRoute>> = new Map();
-  staticMatchers: Map<string, PathRoute> = new Map();
+  matcherByMinPrefix: mapMatchByMinPrefix = {};
+  staticMatchers: mapStaticMatchers = {};
   minPrefixLength: number = Infinity;
 
   on(path: string, callback: any) {
@@ -106,7 +114,7 @@ class PathRouter {
     );
 
     if (isStatic) {
-      this.staticMatchers.set(path, route);
+      this.staticMatchers[path] = route;
       return;
     }
 
@@ -117,19 +125,19 @@ class PathRouter {
       this.minPrefixLength = minPrefixLength;
     }
 
-    this.matcherByMinPrefix = new Map();
+    this.matcherByMinPrefix = {};
     let $self = this;
 
     this.routes.forEach(function (route) {
       const prefix = route.path.slice(0, $self.minPrefixLength);
-      const routes = $self.matcherByMinPrefix.get(prefix) || [];
+      const routes = $self.matcherByMinPrefix[prefix] || [];
       routes.push(route);
-      $self.matcherByMinPrefix.set(prefix, routes);
+      $self.matcherByMinPrefix[prefix] = routes;
     });
   }
 
   find(path: string) {
-    const matched = this.staticMatchers.get(path);
+    const matched = this.staticMatchers[path];
     if (matched) {
       return {
         callback: matched.callback,
@@ -137,7 +145,7 @@ class PathRouter {
     }
 
     const prefix = path.substring(0, this.minPrefixLength);
-    const matchers = this.matcherByMinPrefix.get(prefix);
+    const matchers = this.matcherByMinPrefix[prefix];
     if (matchers) {
       for (let i = 0; i < matchers.length; i++) {
         const matcher = matchers[i];
@@ -154,17 +162,20 @@ class PathRouter {
   }
 }
 
+type mapPathRouter = {
+  [key: string]: PathRouter;
+};
 class MethodRouter {
-  routes: Map<string, PathRouter> = new Map();
+  routes: mapPathRouter = {};
 
   on(method: string, path: string, callback: any) {
-    const route = this.routes.get(method) || new PathRouter();
+    const route = this.routes[method] || new PathRouter();
     route.on(path, callback);
-    this.routes.set(method, route);
+    this.routes[method] = route;
   }
 
   find(method: string, path: string) {
-    const pathRouter = this.routes.get(method);
+    const pathRouter = this.routes[method];
     if (pathRouter) {
       if (path[0] !== "/") {
         path = "/" + path;
