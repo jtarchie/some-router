@@ -20,6 +20,56 @@ const { callback } = router.find("/");
 console.assert(callback() == "/");
 ```
 
+### Route Types
+
+- Static - This is an exact string match.
+
+```javascript
+import { MethodRouter } from "some-router";
+
+const router = new MethodRouter();
+router.get("/", () => {});
+```
+
+- Named Parameter - This support dynamic content, which will match against a
+  regex wildcard (`.*?`). The parameters are returned in a `params` if a
+  matching route is found as string values.
+
+```javascript
+import { MethodRouter } from "some-router";
+
+const router = new MethodRouter();
+router.get("/persons/:id/children/:child_id", () => {});
+
+const { params } = router.find("/persons/1/children/100");
+console.assert(params == { id: "1", child_id: "100" });
+```
+
+- Regexes - This supports dynamic content that needs to fit a specific regex
+  matcher. The regexes must be represented in a capture group and the values
+  will be returned as `regexN` in index 0 placement of the capture group.
+
+  Named capture groups are also supported. The name on of the group will be
+  placed as is in `params`.
+
+  No effort is done to ensure regexes are proper, valid, etc. If the route isn't
+  matching the regex is most likely wrong.
+
+  **NOTE:** Proper escaping of back slash is required. This is because of
+  javascript string encoding.
+
+```javascript
+import { MethodRouter } from "some-router";
+
+const router = new MethodRouter();
+router.get("/persons/(\\d+)/children/(?<child_id>\\w+)", () => {});
+
+const { params } = router.find("/persons/1/children/100");
+console.assert(params == { regex0: "1", child_id: "100" });
+```
+
+### Precedence
+
 When defining routes, the order of declaration does not matter. The evaluation
 of routes affects the order.
 
@@ -41,7 +91,7 @@ const { callback } = router.find("/a");
 console.assert(callback() == "static");
 ```
 
-- longest matching route based on minimize size of matcher
+- longest matching route based on minimize size of matcher (complexity)
 
 ```javascript
 import { MethodRouter } from "some-router";
