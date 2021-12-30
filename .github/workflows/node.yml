@@ -25,4 +25,5 @@ jobs:
         yarn install
         yarn run test
     - name: Benchmark
+      run: |
         yarn bench
