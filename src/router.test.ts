@@ -273,6 +273,7 @@ describe("a router", function () {
       router.options("/", "OPTIONS /");
       router.patch("/", "PATCH /");
       router.post("/", "POST /");
+      router.pri("/", "PRI /");
       router.propfind("/", "PROPFIND /");
       router.proppatch("/", "PROPPATCH /");
       router.purge("/", "PURGE /");

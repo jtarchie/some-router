@@ -256,6 +256,9 @@ class MethodRouter {
   post(path: string, callback: any) {
     this.on("POST", path, callback);
   }
+  pri(path: string, callback: any) {
+    this.on("PRI", path, callback);
+  }
   propfind(path: string, callback: any) {
     this.on("PROPFIND", path, callback);
   }
