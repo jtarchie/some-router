@@ -20,8 +20,9 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'yarn'
-    - name: Run
+    - name: Tests
       run: |
         yarn install
         yarn run test
+    - name: Benchmark
         yarn bench
