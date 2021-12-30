@@ -17,6 +17,11 @@ type mapStaticMatchers = {
   [key: string]: PathRoute;
 };
 
+interface ResultRoute {
+  params: { [key: string]: string };
+  callback: any;
+}
+
 class PathRouter {
   routes: Array<PathRoute> = [];
   matcherByMinPrefix: mapMatchByMinPrefix = {};
@@ -136,11 +141,12 @@ class PathRouter {
     });
   }
 
-  find(path: string) {
+  find(path: string): ResultRoute | undefined {
     const matched = this.staticMatchers[path];
     if (matched) {
       return {
         callback: matched.callback,
+        params: {},
       };
     }
 
@@ -153,7 +159,7 @@ class PathRouter {
         const matches = matcher.regex.exec(path);
         if (matches) {
           return {
-            params: matches.groups,
+            params: matches.groups || {},
             callback: matcher.callback,
           };
         }
@@ -165,6 +171,7 @@ class PathRouter {
 type mapPathRouter = {
   [key: string]: PathRouter;
 };
+
 class MethodRouter {
   routes: mapPathRouter = {};
 
@@ -174,14 +181,19 @@ class MethodRouter {
     this.routes[method] = route;
   }
 
-  find(method: string, path: string) {
+  find(method: string, path: string): ResultRoute {
     const pathRouter = this.routes[method];
     if (pathRouter) {
       if (path[0] !== "/") {
         path = "/" + path;
       }
-      return pathRouter.find(path);
+      const result = pathRouter.find(path);
+      if (result) {
+        return result;
+      }
     }
+
+    return { params: {}, callback: undefined };
   }
 
   acl(path: string, callback: any) {
