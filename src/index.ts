@@ -1,6 +1,6 @@
 class PathRoute {
   constructor(
-    public callback: any,
+    public callback: unknown,
     public minLength: number,
     public path: string,
     public regex: RegExp,
@@ -19,17 +19,17 @@ type mapStaticMatchers = {
 
 interface ResultRoute {
   params: { [key: string]: string };
-  callback: any;
+  callback: unknown;
 }
 
 class PathRouter {
   routes: Array<PathRoute> = [];
   matcherByMinPrefix: mapMatchByMinPrefix = {};
   staticMatchers: mapStaticMatchers = {};
-  minPrefixLength: number = Infinity;
+  minPrefixLength = Infinity;
 
-  on(path: string, callback: any) {
-    let parts = [];
+  on(path: string, callback: unknown) {
+    const parts = [];
     let minPrefixLength = 0;
     let splatCount = 0;
     let regexCount = 0;
@@ -131,13 +131,12 @@ class PathRouter {
     }
 
     this.matcherByMinPrefix = {};
-    let $self = this;
 
-    this.routes.forEach(function (route) {
-      const prefix = route.path.slice(0, $self.minPrefixLength);
-      const routes = $self.matcherByMinPrefix[prefix] || [];
+    this.routes.forEach((route) => {
+      const prefix = route.path.slice(0, this.minPrefixLength);
+      const routes = this.matcherByMinPrefix[prefix] || [];
       routes.push(route);
-      $self.matcherByMinPrefix[prefix] = routes;
+      this.matcherByMinPrefix[prefix] = routes;
     });
   }
 
@@ -175,7 +174,7 @@ type mapPathRouter = {
 class MethodRouter {
   routes: mapPathRouter = {};
 
-  on(method: string, path: string, callback: any) {
+  on(method: string, path: string, callback: unknown) {
     const route = this.routes[method] || new PathRouter();
     route.on(path, callback);
     this.routes[method] = route;
@@ -196,109 +195,109 @@ class MethodRouter {
     return { params: {}, callback: undefined };
   }
 
-  acl(path: string, callback: any) {
+  acl(path: string, callback: unknown) {
     this.on("ACL", path, callback);
   }
-  bind(path: string, callback: any) {
+  bind(path: string, callback: unknown) {
     this.on("BIND", path, callback);
   }
-  checkout(path: string, callback: any) {
+  checkout(path: string, callback: unknown) {
     this.on("CHECKOUT", path, callback);
   }
-  connect(path: string, callback: any) {
+  connect(path: string, callback: unknown) {
     this.on("CONNECT", path, callback);
   }
-  copy(path: string, callback: any) {
+  copy(path: string, callback: unknown) {
     this.on("COPY", path, callback);
   }
-  delete(path: string, callback: any) {
+  delete(path: string, callback: unknown) {
     this.on("DELETE", path, callback);
   }
-  get(path: string, callback: any) {
+  get(path: string, callback: unknown) {
     this.on("GET", path, callback);
   }
-  head(path: string, callback: any) {
+  head(path: string, callback: unknown) {
     this.on("HEAD", path, callback);
   }
-  link(path: string, callback: any) {
+  link(path: string, callback: unknown) {
     this.on("LINK", path, callback);
   }
-  lock(path: string, callback: any) {
+  lock(path: string, callback: unknown) {
     this.on("LOCK", path, callback);
   }
-  msearch(path: string, callback: any) {
+  msearch(path: string, callback: unknown) {
     this.on("M-SEARCH", path, callback);
   }
-  merge(path: string, callback: any) {
+  merge(path: string, callback: unknown) {
     this.on("MERGE", path, callback);
   }
-  mkactivity(path: string, callback: any) {
+  mkactivity(path: string, callback: unknown) {
     this.on("MKACTIVITY", path, callback);
   }
-  mkcalendar(path: string, callback: any) {
+  mkcalendar(path: string, callback: unknown) {
     this.on("MKCALENDAR", path, callback);
   }
-  mkcol(path: string, callback: any) {
+  mkcol(path: string, callback: unknown) {
     this.on("MKCOL", path, callback);
   }
-  move(path: string, callback: any) {
+  move(path: string, callback: unknown) {
     this.on("MOVE", path, callback);
   }
-  notify(path: string, callback: any) {
+  notify(path: string, callback: unknown) {
     this.on("NOTIFY", path, callback);
   }
-  options(path: string, callback: any) {
+  options(path: string, callback: unknown) {
     this.on("OPTIONS", path, callback);
   }
-  patch(path: string, callback: any) {
+  patch(path: string, callback: unknown) {
     this.on("PATCH", path, callback);
   }
-  post(path: string, callback: any) {
+  post(path: string, callback: unknown) {
     this.on("POST", path, callback);
   }
-  pri(path: string, callback: any) {
+  pri(path: string, callback: unknown) {
     this.on("PRI", path, callback);
   }
-  propfind(path: string, callback: any) {
+  propfind(path: string, callback: unknown) {
     this.on("PROPFIND", path, callback);
   }
-  proppatch(path: string, callback: any) {
+  proppatch(path: string, callback: unknown) {
     this.on("PROPPATCH", path, callback);
   }
-  purge(path: string, callback: any) {
+  purge(path: string, callback: unknown) {
     this.on("PURGE", path, callback);
   }
-  put(path: string, callback: any) {
+  put(path: string, callback: unknown) {
     this.on("PUT", path, callback);
   }
-  rebind(path: string, callback: any) {
+  rebind(path: string, callback: unknown) {
     this.on("REBIND", path, callback);
   }
-  report(path: string, callback: any) {
+  report(path: string, callback: unknown) {
     this.on("REPORT", path, callback);
   }
-  search(path: string, callback: any) {
+  search(path: string, callback: unknown) {
     this.on("SEARCH", path, callback);
   }
-  source(path: string, callback: any) {
+  source(path: string, callback: unknown) {
     this.on("SOURCE", path, callback);
   }
-  subscribe(path: string, callback: any) {
+  subscribe(path: string, callback: unknown) {
     this.on("SUBSCRIBE", path, callback);
   }
-  trace(path: string, callback: any) {
+  trace(path: string, callback: unknown) {
     this.on("TRACE", path, callback);
   }
-  unbind(path: string, callback: any) {
+  unbind(path: string, callback: unknown) {
     this.on("UNBIND", path, callback);
   }
-  unlink(path: string, callback: any) {
+  unlink(path: string, callback: unknown) {
     this.on("UNLINK", path, callback);
   }
-  unlock(path: string, callback: any) {
+  unlock(path: string, callback: unknown) {
     this.on("UNLOCK", path, callback);
   }
-  unsubscribe(path: string, callback: any) {
+  unsubscribe(path: string, callback: unknown) {
     this.on("UNSUBSCRIBE", path, callback);
   }
 }

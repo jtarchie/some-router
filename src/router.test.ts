@@ -21,7 +21,7 @@ routes.forEach(function (route) {
   router.on(
     route.method,
     route.url,
-    function (index) {
+    function (route) {
       return route;
     }(route),
   );
@@ -29,34 +29,36 @@ routes.forEach(function (route) {
 
 describe("when using the benchmark router", function () {
   it("returns a router", function () {
-    var { callback } = router.find("GET", "/user");
+    let callback: unknown;
+
+    ({ callback } = router.find("GET", "/user"));
     expect(callback).toEqual({ method: "GET", url: "/user" });
 
-    var { callback } = router.find("GET", "/user/comments");
+    ({ callback } = router.find("GET", "/user/comments"));
     expect(callback).toEqual({ method: "GET", url: "/user/comments" });
 
-    var { callback } = router.find("GET", "/user/lookup/username/john");
+    ({ callback } = router.find("GET", "/user/lookup/username/john"));
     expect(callback).toEqual({
       method: "GET",
       url: "/user/lookup/username/:username",
     });
 
-    var { callback } = router.find("GET", "/event/abcd1234/comments");
+    ({ callback } = router.find("GET", "/event/abcd1234/comments"));
     expect(callback).toEqual({
       method: "GET",
       url: "/event/:id/comments",
     });
 
-    var { callback } = router.find(
+    ({ callback } = router.find(
       "GET",
       "/very/deeply/nested/route/hello/there",
-    );
+    ));
     expect(callback).toEqual({
       method: "GET",
       url: "/very/deeply/nested/route/hello/there",
     });
 
-    var { callback } = router.find("GET", "/static/index.html");
+    ({ callback } = router.find("GET", "/static/index.html"));
     expect(callback).toEqual({
       method: "GET",
       url: "/static/*",
@@ -70,10 +72,10 @@ describe("a router", function () {
     router.on("GET", "/", "/");
     router.on("GET", "/user", "/user");
 
-    var { callback } = router.find("GET", "");
+    let { callback } = router.find("GET", "");
     expect(callback).toEqual("/");
 
-    var { callback } = router.find("GET", "user");
+    ({ callback } = router.find("GET", "user"));
     expect(callback).toEqual("/user");
   });
 

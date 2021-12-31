@@ -20,7 +20,7 @@
     "bench": "ts-node src/benchmark.ts",
     "build": "npx tsc",
     "fmt": "deno fmt src/ *.md",
-    "lint": "deno lint --rules-tags=recommendation src/",
+    "lint": "deno lint src/",
     "test": "yarn run lint && yarn run fmt && npx jest"
   },
   "jest": {
