@@ -1,6 +1,7 @@
+import { Http2ServerRequest, Http2ServerResponse } from "http2";
 class PathRoute {
   constructor(
-    public callback: unknown,
+    public callback: Function,
     public minLength: number,
     public path: string,
     public regex: RegExp,
@@ -19,7 +20,7 @@ type mapStaticMatchers = {
 
 interface ResultRoute {
   params: { [key: string]: string };
-  callback: unknown;
+  callback: Function | undefined;
 }
 
 class PathRouter {
@@ -28,7 +29,7 @@ class PathRouter {
   staticMatchers: mapStaticMatchers = {};
   minPrefixLength = Infinity;
 
-  on(path: string, callback: unknown) {
+  on(path: string, callback: Function) {
     const parts = [];
     let minPrefixLength = 0;
     let splatCount = 0;
@@ -174,7 +175,7 @@ type mapPathRouter = {
 class MethodRouter {
   routes: mapPathRouter = {};
 
-  on(method: string, path: string, callback: unknown) {
+  on(method: string, path: string, callback: Function) {
     const route = this.routes[method] || new PathRouter();
     route.on(path, callback);
     this.routes[method] = route;
@@ -195,112 +196,125 @@ class MethodRouter {
     return { params: {}, callback: undefined };
   }
 
-  acl(path: string, callback: unknown) {
+  acl(path: string, callback: Function) {
     this.on("ACL", path, callback);
   }
-  bind(path: string, callback: unknown) {
+  bind(path: string, callback: Function) {
     this.on("BIND", path, callback);
   }
-  checkout(path: string, callback: unknown) {
+  checkout(path: string, callback: Function) {
     this.on("CHECKOUT", path, callback);
   }
-  connect(path: string, callback: unknown) {
+  connect(path: string, callback: Function) {
     this.on("CONNECT", path, callback);
   }
-  copy(path: string, callback: unknown) {
+  copy(path: string, callback: Function) {
     this.on("COPY", path, callback);
   }
-  delete(path: string, callback: unknown) {
+  delete(path: string, callback: Function) {
     this.on("DELETE", path, callback);
   }
-  get(path: string, callback: unknown) {
+  get(path: string, callback: Function) {
     this.on("GET", path, callback);
   }
-  head(path: string, callback: unknown) {
+  head(path: string, callback: Function) {
     this.on("HEAD", path, callback);
   }
-  link(path: string, callback: unknown) {
+  link(path: string, callback: Function) {
     this.on("LINK", path, callback);
   }
-  lock(path: string, callback: unknown) {
+  lock(path: string, callback: Function) {
     this.on("LOCK", path, callback);
   }
-  msearch(path: string, callback: unknown) {
+  msearch(path: string, callback: Function) {
     this.on("M-SEARCH", path, callback);
   }
-  merge(path: string, callback: unknown) {
+  merge(path: string, callback: Function) {
     this.on("MERGE", path, callback);
   }
-  mkactivity(path: string, callback: unknown) {
+  mkactivity(path: string, callback: Function) {
     this.on("MKACTIVITY", path, callback);
   }
-  mkcalendar(path: string, callback: unknown) {
+  mkcalendar(path: string, callback: Function) {
     this.on("MKCALENDAR", path, callback);
   }
-  mkcol(path: string, callback: unknown) {
+  mkcol(path: string, callback: Function) {
     this.on("MKCOL", path, callback);
   }
-  move(path: string, callback: unknown) {
+  move(path: string, callback: Function) {
     this.on("MOVE", path, callback);
   }
-  notify(path: string, callback: unknown) {
+  notify(path: string, callback: Function) {
     this.on("NOTIFY", path, callback);
   }
-  options(path: string, callback: unknown) {
+  options(path: string, callback: Function) {
     this.on("OPTIONS", path, callback);
   }
-  patch(path: string, callback: unknown) {
+  patch(path: string, callback: Function) {
     this.on("PATCH", path, callback);
   }
-  post(path: string, callback: unknown) {
+  post(path: string, callback: Function) {
     this.on("POST", path, callback);
   }
-  pri(path: string, callback: unknown) {
+  pri(path: string, callback: Function) {
     this.on("PRI", path, callback);
   }
-  propfind(path: string, callback: unknown) {
+  propfind(path: string, callback: Function) {
     this.on("PROPFIND", path, callback);
   }
-  proppatch(path: string, callback: unknown) {
+  proppatch(path: string, callback: Function) {
     this.on("PROPPATCH", path, callback);
   }
-  purge(path: string, callback: unknown) {
+  purge(path: string, callback: Function) {
     this.on("PURGE", path, callback);
   }
-  put(path: string, callback: unknown) {
+  put(path: string, callback: Function) {
     this.on("PUT", path, callback);
   }
-  rebind(path: string, callback: unknown) {
+  rebind(path: string, callback: Function) {
     this.on("REBIND", path, callback);
   }
-  report(path: string, callback: unknown) {
+  report(path: string, callback: Function) {
     this.on("REPORT", path, callback);
   }
-  search(path: string, callback: unknown) {
+  search(path: string, callback: Function) {
     this.on("SEARCH", path, callback);
   }
-  source(path: string, callback: unknown) {
+  source(path: string, callback: Function) {
     this.on("SOURCE", path, callback);
   }
-  subscribe(path: string, callback: unknown) {
+  subscribe(path: string, callback: Function) {
     this.on("SUBSCRIBE", path, callback);
   }
-  trace(path: string, callback: unknown) {
+  trace(path: string, callback: Function) {
     this.on("TRACE", path, callback);
   }
-  unbind(path: string, callback: unknown) {
+  unbind(path: string, callback: Function) {
     this.on("UNBIND", path, callback);
   }
-  unlink(path: string, callback: unknown) {
+  unlink(path: string, callback: Function) {
     this.on("UNLINK", path, callback);
   }
-  unlock(path: string, callback: unknown) {
+  unlock(path: string, callback: Function) {
     this.on("UNLOCK", path, callback);
   }
-  unsubscribe(path: string, callback: unknown) {
+  unsubscribe(path: string, callback: Function) {
     this.on("UNSUBSCRIBE", path, callback);
   }
 }
 
-export default MethodRouter;
-export { MethodRouter };
+class HTTPRouter extends MethodRouter {
+  lookup(request: Http2ServerRequest, response: Http2ServerResponse) {
+    const { params, callback } = this.find(request.method, request.url);
+
+    if (callback) {
+      callback(request, response, params);
+      return;
+    }
+
+    response.writeHead(404);
+    response.end();
+  }
+}
+
+export { HTTPRouter, MethodRouter };

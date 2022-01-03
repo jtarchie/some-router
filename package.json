@@ -10,8 +10,11 @@
     "@types/benchmark": "^2.1.1",
     "@types/jest": "^27.4.0",
     "benny": "^3.7.1",
+    "express": "^4.17.2",
     "find-my-way": "^5.1.1",
     "jest": "^27.4.5",
+    "regenerator-runtime": "^0.13.9",
+    "supertest": "^6.1.6",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.4"
   },
@@ -19,7 +22,7 @@
     "bench": "ts-node src/benchmark.ts",
     "build": "npx tsc",
     "fmt": "deno fmt src/ *.md",
-    "lint": "deno lint src/",
+    "lint": "deno lint --rules-exclude=ban-types src/",
     "test": "yarn run lint && yarn run fmt && npx jest"
   },
   "jest": {

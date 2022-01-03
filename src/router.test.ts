@@ -1,5 +1,7 @@
-import { MethodRouter } from ".";
+import { HTTPRouter, MethodRouter } from ".";
 import { METHODS } from "http";
+import supertest from "supertest";
+import express from "express";
 
 const routes = [
   { method: "GET", url: "/user" },
@@ -21,30 +23,28 @@ routes.forEach(function (route) {
   router.on(
     route.method,
     route.url,
-    function (route) {
-      return route;
-    }(route),
+    () => route,
   );
 });
 
-describe("when using the benchmark router", function () {
+describe("when using the method router", function () {
   it("returns a router", function () {
-    let callback: unknown;
+    let callback: Function;
 
     ({ callback } = router.find("GET", "/user"));
-    expect(callback).toEqual({ method: "GET", url: "/user" });
+    expect(callback()).toEqual({ method: "GET", url: "/user" });
 
     ({ callback } = router.find("GET", "/user/comments"));
-    expect(callback).toEqual({ method: "GET", url: "/user/comments" });
+    expect(callback()).toEqual({ method: "GET", url: "/user/comments" });
 
     ({ callback } = router.find("GET", "/user/lookup/username/john"));
-    expect(callback).toEqual({
+    expect(callback()).toEqual({
       method: "GET",
       url: "/user/lookup/username/:username",
     });
 
     ({ callback } = router.find("GET", "/event/abcd1234/comments"));
-    expect(callback).toEqual({
+    expect(callback()).toEqual({
       method: "GET",
       url: "/event/:id/comments",
     });
@@ -53,13 +53,13 @@ describe("when using the benchmark router", function () {
       "GET",
       "/very/deeply/nested/route/hello/there",
     ));
-    expect(callback).toEqual({
+    expect(callback()).toEqual({
       method: "GET",
       url: "/very/deeply/nested/route/hello/there",
     });
 
     ({ callback } = router.find("GET", "/static/index.html"));
-    expect(callback).toEqual({
+    expect(callback()).toEqual({
       method: "GET",
       url: "/static/*",
     });
@@ -69,44 +69,44 @@ describe("when using the benchmark router", function () {
 describe("a router", function () {
   it("defaults to matching with a leading slash", function () {
     const router = new MethodRouter();
-    router.on("GET", "/", "/");
-    router.on("GET", "/user", "/user");
+    router.on("GET", "/", () => "/");
+    router.on("GET", "/user", () => "/user");
 
     let { callback } = router.find("GET", "");
-    expect(callback).toEqual("/");
+    expect(callback()).toEqual("/");
 
     ({ callback } = router.find("GET", "user"));
-    expect(callback).toEqual("/user");
+    expect(callback()).toEqual("/user");
   });
 
   describe("when using splatting", function () {
     it("supports named splats", function () {
       const router = new MethodRouter();
-      router.on("GET", "/*named", "named");
+      router.on("GET", "/*named", () => "named");
 
       const { callback, params } = router.find("GET", "/an/entire/path");
-      expect(callback).toEqual("named");
+      expect(callback()).toEqual("named");
       expect(params).toEqual({ named: "an/entire/path" });
     });
 
     it("supports multiple named splats", function () {
       const router = new MethodRouter();
-      router.on("GET", "/*a/foo/*b", "named");
+      router.on("GET", "/*a/foo/*b", () => "named");
 
       const { callback, params } = router.find("GET", "/zoo/woo/foo/bar/baz");
-      expect(callback).toEqual("named");
+      expect(callback()).toEqual("named");
       expect(params).toEqual({ a: "zoo/woo", b: "bar/baz" });
     });
 
     it("supports splats and params", function () {
       const router = new MethodRouter();
-      router.on("GET", "/books/*section/:title", "named");
+      router.on("GET", "/books/*section/:title", () => "named");
 
       const { callback, params } = router.find(
         "GET",
         "/books/some/section/last-words-a-memoir",
       );
-      expect(callback).toEqual("named");
+      expect(callback()).toEqual("named");
       expect(params).toEqual({
         section: "some/section",
         title: "last-words-a-memoir",
@@ -115,13 +115,13 @@ describe("a router", function () {
 
     it("returns 'splats' for anonymous splats", function () {
       const router = new MethodRouter();
-      router.on("GET", "/say/*/to/*", "anonymous");
+      router.on("GET", "/say/*/to/*", () => "anonymous");
 
       const { callback, params } = router.find(
         "GET",
         "/say/hello/to/world",
       );
-      expect(callback).toEqual("anonymous");
+      expect(callback()).toEqual("anonymous");
       expect(params).toEqual({
         splat0: "hello",
         splat1: "world",
@@ -130,13 +130,13 @@ describe("a router", function () {
 
     it("returns anonymous and named splats", function () {
       const router = new MethodRouter();
-      router.on("GET", "/say/*a/to/*", "anonymous");
+      router.on("GET", "/say/*a/to/*", () => "anonymous");
 
       const { callback, params } = router.find(
         "GET",
         "/say/hello/to/world",
       );
-      expect(callback).toEqual("anonymous");
+      expect(callback()).toEqual("anonymous");
       expect(params).toEqual({
         splat0: "world",
         a: "hello",
@@ -147,13 +147,13 @@ describe("a router", function () {
   describe("when using params", function () {
     it("uses the shortest distance to match", function () {
       const router = new MethodRouter();
-      router.on("GET", "/customer/:name-:surname", "params");
+      router.on("GET", "/customer/:name-:surname", () => "params");
 
       const { callback, params } = router.find(
         "GET",
         "/customer/john-doe",
       );
-      expect(callback).toEqual("params");
+      expect(callback()).toEqual("params");
       expect(params).toEqual({
         name: "john",
         surname: "doe",
@@ -162,13 +162,13 @@ describe("a router", function () {
 
     it("can read nested params for a file extension", function () {
       const router = new MethodRouter();
-      router.on("GET", "/profile/:id.:format", "params");
+      router.on("GET", "/profile/:id.:format", () => "params");
 
       const { callback, params } = router.find(
         "GET",
         "/profile/123.jpeg",
       );
-      expect(callback).toEqual("params");
+      expect(callback()).toEqual("params");
       expect(params).toEqual({
         id: "123",
         format: "jpeg",
@@ -179,25 +179,25 @@ describe("a router", function () {
   describe("when using routes with unicode", function () {
     it("specific routes have precedence", function () {
       const router = new MethodRouter();
-      router.on("GET", "/*", "named");
-      router.on("GET", "/こんにちは", "unicode");
+      router.on("GET", "/*", () => "named");
+      router.on("GET", "/こんにちは", () => "unicode");
 
       const { callback } = router.find(
         "GET",
         "/こんにちは",
       );
-      expect(callback).toEqual("unicode");
+      expect(callback()).toEqual("unicode");
     });
 
     it("allows params to use unicode", function () {
       const router = new MethodRouter();
-      router.on("GET", "/profile/:name", "unicode");
+      router.on("GET", "/profile/:name", () => "unicode");
 
       const { callback, params } = router.find(
         "GET",
         "/profile/こんにちは",
       );
-      expect(callback).toEqual("unicode");
+      expect(callback()).toEqual("unicode");
       expect(params).toEqual({
         name: "こんにちは",
       });
@@ -205,13 +205,13 @@ describe("a router", function () {
 
     it("allows splats to use unicode", function () {
       const router = new MethodRouter();
-      router.on("GET", "/profile/*name", "unicode");
+      router.on("GET", "/profile/*name", () => "unicode");
 
       const { callback, params } = router.find(
         "GET",
         "/profile/こんにちは",
       );
-      expect(callback).toEqual("unicode");
+      expect(callback()).toEqual("unicode");
       expect(params).toEqual({
         name: "こんにちは",
       });
@@ -221,13 +221,17 @@ describe("a router", function () {
   describe("when using regexes", function () {
     it("allows named captured groups", function () {
       const router = new MethodRouter();
-      router.on("GET", `/customer/(?<name>\\w+)-(?<surname>\\w+)`, "regex");
+      router.on(
+        "GET",
+        `/customer/(?<name>\\w+)-(?<surname>\\w+)`,
+        () => "regex",
+      );
 
       const { callback, params } = router.find(
         "GET",
         "/customer/john-doe",
       );
-      expect(callback).toEqual("regex");
+      expect(callback()).toEqual("regex");
       expect(params).toEqual({
         name: "john",
         surname: "doe",
@@ -236,13 +240,13 @@ describe("a router", function () {
 
     it("returns 'capture' for anonymous regexes", function () {
       const router = new MethodRouter();
-      router.on("GET", `/customer/(\\w+)-(\\w+)`, "regex");
+      router.on("GET", `/customer/(\\w+)-(\\w+)`, () => "regex");
 
       const { callback, params } = router.find(
         "GET",
         "/customer/john-doe",
       );
-      expect(callback).toEqual("regex");
+      expect(callback()).toEqual("regex");
       expect(params).toEqual({
         regex0: "john",
         regex1: "doe",
@@ -255,48 +259,67 @@ describe("a router", function () {
 
     beforeEach(function () {
       router = new MethodRouter();
-      router.acl("/", "ACL /");
-      router.bind("/", "BIND /");
-      router.checkout("/", "CHECKOUT /");
-      router.connect("/", "CONNECT /");
-      router.copy("/", "COPY /");
-      router.delete("/", "DELETE /");
-      router.get("/", "GET /");
-      router.head("/", "HEAD /");
-      router.link("/", "LINK /");
-      router.lock("/", "LOCK /");
-      router.msearch("/", "M-SEARCH /");
-      router.merge("/", "MERGE /");
-      router.mkactivity("/", "MKACTIVITY /");
-      router.mkcalendar("/", "MKCALENDAR /");
-      router.mkcol("/", "MKCOL /");
-      router.move("/", "MOVE /");
-      router.notify("/", "NOTIFY /");
-      router.options("/", "OPTIONS /");
-      router.patch("/", "PATCH /");
-      router.post("/", "POST /");
-      router.pri("/", "PRI /");
-      router.propfind("/", "PROPFIND /");
-      router.proppatch("/", "PROPPATCH /");
-      router.purge("/", "PURGE /");
-      router.put("/", "PUT /");
-      router.rebind("/", "REBIND /");
-      router.report("/", "REPORT /");
-      router.search("/", "SEARCH /");
-      router.source("/", "SOURCE /");
-      router.subscribe("/", "SUBSCRIBE /");
-      router.trace("/", "TRACE /");
-      router.unbind("/", "UNBIND /");
-      router.unlink("/", "UNLINK /");
-      router.unlock("/", "UNLOCK /");
-      router.unsubscribe("/", "UNSUBSCRIBE /");
+      router.acl("/", () => "ACL /");
+      router.bind("/", () => "BIND /");
+      router.checkout("/", () => "CHECKOUT /");
+      router.connect("/", () => "CONNECT /");
+      router.copy("/", () => "COPY /");
+      router.delete("/", () => "DELETE /");
+      router.get("/", () => "GET /");
+      router.head("/", () => "HEAD /");
+      router.link("/", () => "LINK /");
+      router.lock("/", () => "LOCK /");
+      router.msearch("/", () => "M-SEARCH /");
+      router.merge("/", () => "MERGE /");
+      router.mkactivity("/", () => "MKACTIVITY /");
+      router.mkcalendar("/", () => "MKCALENDAR /");
+      router.mkcol("/", () => "MKCOL /");
+      router.move("/", () => "MOVE /");
+      router.notify("/", () => "NOTIFY /");
+      router.options("/", () => "OPTIONS /");
+      router.patch("/", () => "PATCH /");
+      router.post("/", () => "POST /");
+      router.pri("/", () => "PRI /");
+      router.propfind("/", () => "PROPFIND /");
+      router.proppatch("/", () => "PROPPATCH /");
+      router.purge("/", () => "PURGE /");
+      router.put("/", () => "PUT /");
+      router.rebind("/", () => "REBIND /");
+      router.report("/", () => "REPORT /");
+      router.search("/", () => "SEARCH /");
+      router.source("/", () => "SOURCE /");
+      router.subscribe("/", () => "SUBSCRIBE /");
+      router.trace("/", () => "TRACE /");
+      router.unbind("/", () => "UNBIND /");
+      router.unlink("/", () => "UNLINK /");
+      router.unlock("/", () => "UNLOCK /");
+      router.unsubscribe("/", () => "UNSUBSCRIBE /");
     });
 
     METHODS.forEach(function (method) {
       it(`supports ${method}`, function () {
         const { callback } = router.find(method, "/");
-        expect(callback).toEqual(`${method} /`);
+        expect(callback()).toEqual(`${method} /`);
       });
     });
+  });
+});
+
+describe("when using http router", function () {
+  it("handles a GET request", async function () {
+    const router = new HTTPRouter();
+    const app = express();
+
+    router.get("/persons/:name", (_request, response, params) => {
+      response.writeHead(200);
+      response.end(`Hello, ${params.name}`);
+    });
+
+    app.get("*", (request, response) => {
+      router.lookup(request, response);
+    });
+
+    const response = await supertest(app).get("/persons/bob");
+    expect(response.statusCode).toEqual(200);
   });
 });
