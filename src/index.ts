@@ -1,4 +1,3 @@
-import { Http2ServerRequest, Http2ServerResponse } from "http2";
 class PathRoute {
   constructor(
     public callback: Function,
@@ -303,8 +302,18 @@ class MethodRouter {
   }
 }
 
+interface HTTPRequest {
+  method: string;
+  url: string;
+}
+
+interface HTTPResponse {
+  writeHead(status: number): void;
+  end(): void;
+}
+
 class HTTPRouter extends MethodRouter {
-  lookup(request: Http2ServerRequest, response: Http2ServerResponse) {
+  lookup(request: HTTPRequest, response: HTTPResponse) {
     const { params, callback } = this.find(request.method, request.url);
 
     if (callback) {

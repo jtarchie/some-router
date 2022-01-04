@@ -8,6 +8,7 @@
     "@swc/core": "^1.2.126",
     "@swc/jest": "^0.2.15",
     "@types/benchmark": "^2.1.1",
+    "@types/express": "^4.17.13",
     "@types/jest": "^27.4.0",
     "benny": "^3.7.1",
     "express": "^4.17.2",

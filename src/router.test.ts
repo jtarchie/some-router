@@ -306,20 +306,30 @@ describe("a router", function () {
 });
 
 describe("when using http router", function () {
-  it("handles a GET request", async function () {
-    const router = new HTTPRouter();
-    const app = express();
+  let app: express.Application;
+  let router: HTTPRouter;
 
+  beforeEach(function () {
+    app = express();
+    router = new HTTPRouter();
+
+    app.get("*", (request, response) => {
+      router.lookup(request, response);
+    });
+  });
+
+  it("handles a GET request", async function () {
     router.get("/persons/:name", (_request, response, params) => {
       response.writeHead(200);
       response.end(`Hello, ${params.name}`);
     });
 
-    app.get("*", (request, response) => {
-      router.lookup(request, response);
-    });
-
     const response = await supertest(app).get("/persons/bob");
     expect(response.statusCode).toEqual(200);
+  });
+
+  it("has a 404 when no path is found", async function () {
+    const response = await supertest(app).get("/persons/bob");
+    expect(response.statusCode).toEqual(404);
   });
 });
