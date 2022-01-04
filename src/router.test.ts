@@ -19,7 +19,7 @@ const routes = [
 ];
 
 const router = new MethodRouter();
-routes.forEach(function (route) {
+routes.forEach((route) => {
   router.on(
     route.method,
     route.url,
@@ -27,8 +27,8 @@ routes.forEach(function (route) {
   );
 });
 
-describe("when using the method router", function () {
-  it("returns a router", function () {
+describe("when using the method router", () => {
+  it("returns a router", () => {
     let callback: Function;
 
     ({ callback } = router.find("GET", "/user"));
@@ -66,8 +66,8 @@ describe("when using the method router", function () {
   });
 });
 
-describe("a router", function () {
-  it("defaults to matching with a leading slash", function () {
+describe("a router", () => {
+  it("defaults to matching with a leading slash", () => {
     const router = new MethodRouter();
     router.on("GET", "/", () => "/");
     router.on("GET", "/user", () => "/user");
@@ -79,8 +79,8 @@ describe("a router", function () {
     expect(callback()).toEqual("/user");
   });
 
-  describe("when using splatting", function () {
-    it("supports named splats", function () {
+  describe("when using splatting", () => {
+    it("supports named splats", () => {
       const router = new MethodRouter();
       router.on("GET", "/*named", () => "named");
 
@@ -89,7 +89,7 @@ describe("a router", function () {
       expect(params).toEqual({ named: "an/entire/path" });
     });
 
-    it("supports multiple named splats", function () {
+    it("supports multiple named splats", () => {
       const router = new MethodRouter();
       router.on("GET", "/*a/foo/*b", () => "named");
 
@@ -98,7 +98,7 @@ describe("a router", function () {
       expect(params).toEqual({ a: "zoo/woo", b: "bar/baz" });
     });
 
-    it("supports splats and params", function () {
+    it("supports splats and params", () => {
       const router = new MethodRouter();
       router.on("GET", "/books/*section/:title", () => "named");
 
@@ -113,7 +113,7 @@ describe("a router", function () {
       });
     });
 
-    it("returns 'splats' for anonymous splats", function () {
+    it("returns 'splats' for anonymous splats", () => {
       const router = new MethodRouter();
       router.on("GET", "/say/*/to/*", () => "anonymous");
 
@@ -128,7 +128,7 @@ describe("a router", function () {
       });
     });
 
-    it("returns anonymous and named splats", function () {
+    it("returns anonymous and named splats", () => {
       const router = new MethodRouter();
       router.on("GET", "/say/*a/to/*", () => "anonymous");
 
@@ -144,8 +144,8 @@ describe("a router", function () {
     });
   });
 
-  describe("when using params", function () {
-    it("uses the shortest distance to match", function () {
+  describe("when using params", () => {
+    it("uses the shortest distance to match", () => {
       const router = new MethodRouter();
       router.on("GET", "/customer/:name-:surname", () => "params");
 
@@ -160,7 +160,7 @@ describe("a router", function () {
       });
     });
 
-    it("can read nested params for a file extension", function () {
+    it("can read nested params for a file extension", () => {
       const router = new MethodRouter();
       router.on("GET", "/profile/:id.:format", () => "params");
 
@@ -176,8 +176,8 @@ describe("a router", function () {
     });
   });
 
-  describe("when using routes with unicode", function () {
-    it("specific routes have precedence", function () {
+  describe("when using routes with unicode", () => {
+    it("specific routes have precedence", () => {
       const router = new MethodRouter();
       router.on("GET", "/*", () => "named");
       router.on("GET", "/こんにちは", () => "unicode");
@@ -189,7 +189,7 @@ describe("a router", function () {
       expect(callback()).toEqual("unicode");
     });
 
-    it("allows params to use unicode", function () {
+    it("allows params to use unicode", () => {
       const router = new MethodRouter();
       router.on("GET", "/profile/:name", () => "unicode");
 
@@ -203,7 +203,7 @@ describe("a router", function () {
       });
     });
 
-    it("allows splats to use unicode", function () {
+    it("allows splats to use unicode", () => {
       const router = new MethodRouter();
       router.on("GET", "/profile/*name", () => "unicode");
 
@@ -218,8 +218,8 @@ describe("a router", function () {
     });
   });
 
-  describe("when using regexes", function () {
-    it("allows named captured groups", function () {
+  describe("when using regexes", () => {
+    it("allows named captured groups", () => {
       const router = new MethodRouter();
       router.on(
         "GET",
@@ -238,7 +238,7 @@ describe("a router", function () {
       });
     });
 
-    it("returns 'capture' for anonymous regexes", function () {
+    it("returns 'capture' for anonymous regexes", () => {
       const router = new MethodRouter();
       router.on("GET", `/customer/(\\w+)-(\\w+)`, () => "regex");
 
@@ -254,10 +254,10 @@ describe("a router", function () {
     });
   });
 
-  describe("with all supported HTTP methods", function () {
+  describe("with all supported HTTP methods", () => {
     let router: MethodRouter;
 
-    beforeEach(function () {
+    beforeEach(() => {
       router = new MethodRouter();
       router.acl("/", () => "ACL /");
       router.bind("/", () => "BIND /");
@@ -296,8 +296,8 @@ describe("a router", function () {
       router.unsubscribe("/", () => "UNSUBSCRIBE /");
     });
 
-    METHODS.forEach(function (method) {
-      it(`supports ${method}`, function () {
+    METHODS.forEach((method) => {
+      it(`supports ${method}`, () => {
         const { callback } = router.find(method, "/");
         expect(callback()).toEqual(`${method} /`);
       });
@@ -305,11 +305,11 @@ describe("a router", function () {
   });
 });
 
-describe("when using http router", function () {
+describe("when using http router", () => {
   let app: express.Application;
   let router: HTTPRouter;
 
-  beforeEach(function () {
+  beforeEach(() => {
     app = express();
     router = new HTTPRouter();
 
@@ -318,7 +318,7 @@ describe("when using http router", function () {
     });
   });
 
-  it("handles a GET request", async function () {
+  it("handles a GET request", async () => {
     router.get("/persons/:name", (_request, response, params) => {
       response.writeHead(200);
       response.end(`Hello, ${params.name}`);
@@ -328,7 +328,7 @@ describe("when using http router", function () {
     expect(response.statusCode).toEqual(200);
   });
 
-  it("has a 404 when no path is found", async function () {
+  it("has a 404 when no path is found", async () => {
     const response = await supertest(app).get("/persons/bob");
     expect(response.statusCode).toEqual(404);
   });
