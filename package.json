@@ -1,5 +1,5 @@
 {
-  "name": "some-router",
+  "name": "@jtarchie/some-router",
   "version": "0.0.1",
   "description": "router for http requests that is platform agnostic",
   "main": "dist/index.js",
