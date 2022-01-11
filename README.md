@@ -3,6 +3,10 @@
 A framework independent routing in Javascript. It will match params, globs, and
 static routes. It does not invoke the handler, just returns it.
 
+Influenced by my experience in Sinatra Ruby framework. Motivation to have
+generic router that can be used across different platforms -- HTTP, Cloudflare
+Workers, etc.
+
 ## Usage
 
 ```javascript

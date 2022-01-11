@@ -1,6 +1,6 @@
 {
   "name": "some-router",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "router for http requests that is platform agnostic",
   "main": "dist/index.js",
   "license": "MIT",
