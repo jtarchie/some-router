@@ -3,6 +3,8 @@
   "version": "0.0.1",
   "description": "router for http requests that is platform agnostic",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist/"],
   "license": "MIT",
   "devDependencies": {
     "@swc/core": "^1.2.128",
