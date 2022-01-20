@@ -26,7 +26,7 @@
   "scripts": {
     "bench": "ts-node src/benchmark.ts",
     "build": "npx tsc",
-    "fmt": "deno fmt src/ *.md",
+    "fmt": "deno fmt src/ *.md *.json",
     "lint": "deno lint --rules-exclude=ban-types src/",
     "prepublishOnly": "yarn build",
     "test": "yarn run lint && yarn run fmt && npx jest"
