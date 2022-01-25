@@ -9,7 +9,7 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@swc/core": "^1.2.131",
+    "@swc/core": "^1.2.135",
     "@swc/jest": "^0.2.17",
     "@types/benchmark": "^2.1.1",
     "@types/express": "^4.17.13",
@@ -21,7 +21,7 @@
     "regenerator-runtime": "^0.13.9",
     "supertest": "^6.2.2",
     "ts-node": "^10.4.0",
-    "typescript": "^4.5.4"
+    "typescript": "^4.5.5"
   },
   "scripts": {
     "bench": "ts-node src/benchmark.ts",
