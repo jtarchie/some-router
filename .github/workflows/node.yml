@@ -14,6 +14,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: denoland/setup-deno@v1
+    - uses: actions/setup-python@v2
+      with:
+        cache: 'pip'
     - name: node ${{ matrix.node-version }}
       uses: actions/setup-node@v2
       with:
@@ -26,3 +29,9 @@ jobs:
     - name: Benchmark
       run: |
         yarn bench
+    - name: byexample installation
+      run: |
+        pip install byexample
+    - name: byexample
+      run: |
+        byexample -l javascript README.md
