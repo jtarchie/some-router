@@ -1,6 +1,6 @@
 {
   "name": "@jtarchie/some-router",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "router for http requests that is platform agnostic",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
