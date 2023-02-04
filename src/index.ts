@@ -330,8 +330,10 @@ class HTTPRouter extends MethodRouter {
 class EventRouter extends MethodRouter {
   async handle(event: FetchEvent): Promise<Response> {
     const request = event.request;
-    const url = new URL(request.url);
-    const { params, callback } = this.find(request.method, url.pathname);
+    const { params, callback } = this.find(
+      request.method,
+      this.pathname(request.url),
+    );
 
     if (callback) {
       return await callback({ event, params });
@@ -341,6 +343,21 @@ class EventRouter extends MethodRouter {
       status: 404,
     });
     return response;
+  }
+
+  pathname(url: string): string {
+    const queryIndex = url.indexOf("?");
+    const result = url.substring(
+      url.indexOf("/", 8),
+      queryIndex === -1 ? url.length : queryIndex,
+    );
+
+    //`/hello/hey/` and `/hello/hey` are treated the same
+    if (result.endsWith("/")) {
+      return result.slice(0, -1);
+    }
+
+    return result;
   }
 }
 
