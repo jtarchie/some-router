@@ -54,7 +54,7 @@ class PathRouter {
         case ":": {
           startingPos = ++i;
           for (; i < path.length && /\w/.test(path[i]); i++);
-          parts.push(`(?<${path.slice(startingPos, i)}>[^\.]+)`);
+          parts.push(`(?<${path.slice(startingPos, i)}>.+)`);
           minLength++;
           isStatic = false;
           break;
@@ -154,6 +154,7 @@ class PathRouter {
     if (matchers) {
       for (let i = 0; i < matchers.length; i++) {
         const matcher = matchers[i];
+        if (path.length < matcher.minLength) continue;
 
         const matches = matcher.regex.exec(path);
         if (matches) {
