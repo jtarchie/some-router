@@ -164,21 +164,19 @@ class PathRouter {
   }
 }
 
-type mapPathRouter = {
-  [key: string]: PathRouter;
-};
+type mapPathRouter = Map<string, PathRouter>;
 
 class MethodRouter {
-  routes: mapPathRouter = {};
+  routes: mapPathRouter = new Map();
 
   on(method: string, path: string, callback: Function) {
-    const route = this.routes[method] || new PathRouter();
+    const route = this.routes.get(method) || new PathRouter();
     route.on(path, callback);
-    this.routes[method] = route;
+    this.routes.set(method, route);
   }
 
   find(method: string, path: string): ResultRoute {
-    const pathRouter = this.routes[method];
+    const pathRouter = this.routes.get(method);
     if (pathRouter) {
       if (path[0] !== "/") {
         path = "/" + path;
