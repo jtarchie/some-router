@@ -326,4 +326,21 @@ class HTTPRouter extends MethodRouter {
   }
 }
 
-export { HTTPRouter, MethodRouter };
+class EventRouter extends MethodRouter {
+  async handle(event: FetchEvent): Promise<Response> {
+    const request = event.request;
+    const url = new URL(request.url);
+    const { params, callback } = this.find(request.method, url.pathname);
+
+    if (callback) {
+      return await callback({ event, params });
+    }
+
+    const response = new Response(null, {
+      status: 404,
+    });
+    return response;
+  }
+}
+
+export { EventRouter, HTTPRouter, MethodRouter };

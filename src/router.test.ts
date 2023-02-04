@@ -1,4 +1,4 @@
-import { HTTPRouter, MethodRouter } from ".";
+import { EventRouter, HTTPRouter, MethodRouter } from ".";
 import { METHODS } from "http";
 import supertest from "supertest";
 import express from "express";
@@ -331,5 +331,40 @@ describe("when using http router", () => {
   it("has a 404 when no path is found", async () => {
     const response = await supertest(app).get("/persons/bob");
     expect(response.statusCode).toEqual(404);
+  });
+});
+
+describe("when using the event router", () => {
+  let router: EventRouter;
+
+  beforeEach(() => {
+    router = new EventRouter();
+  });
+
+  it("handles a GET request", async () => {
+    router.get("/persons/:name", ({ params }) => {
+      expect(params).toEqual({ name: "bob" });
+      return new Response(null, {
+        status: 200,
+      });
+    });
+
+    const response = await router.handle({
+      request: {
+        method: "GET",
+        url: "https://example.com/persons/bob",
+      },
+    });
+    expect(response.status).toEqual(200);
+  });
+
+  it("has a 404 when no path is found", async () => {
+    const response = await router.handle({
+      request: {
+        method: "GET",
+        url: "https://example.com/persons/bob",
+      },
+    });
+    expect(response.status).toEqual(404);
   });
 });
