@@ -9,13 +9,9 @@ class PathRoute {
   ) {}
 }
 
-type mapMatchByMinPrefix = {
-  [key: string]: Array<PathRoute>;
-};
+type mapMatchByMinPrefix = Map<string, Array<PathRoute>>;
 
-type mapStaticMatchers = {
-  [key: string]: PathRoute;
-};
+type mapStaticMatchers = Map<string, PathRoute>;
 
 interface ResultRoute {
   params: { [key: string]: string };
@@ -24,8 +20,8 @@ interface ResultRoute {
 
 class PathRouter {
   routes: Array<PathRoute> = [];
-  matcherByMinPrefix: mapMatchByMinPrefix = {};
-  staticMatchers: mapStaticMatchers = {};
+  matcherByMinPrefix: mapMatchByMinPrefix = new Map();
+  staticMatchers: mapStaticMatchers = new Map();
   minPrefixLength = Infinity;
 
   on(path: string, callback: Function) {
@@ -119,7 +115,7 @@ class PathRouter {
     );
 
     if (isStatic) {
-      this.staticMatchers[path] = route;
+      this.staticMatchers.set(path, route);
       return;
     }
 
@@ -130,18 +126,18 @@ class PathRouter {
       this.minPrefixLength = minPrefixLength;
     }
 
-    this.matcherByMinPrefix = {};
+    this.matcherByMinPrefix = new Map();
 
     this.routes.forEach((route) => {
       const prefix = route.path.slice(0, this.minPrefixLength);
-      const routes = this.matcherByMinPrefix[prefix] || [];
+      const routes = this.matcherByMinPrefix.get(prefix) || [];
       routes.push(route);
-      this.matcherByMinPrefix[prefix] = routes;
+      this.matcherByMinPrefix.set(prefix, routes);
     });
   }
 
   find(path: string): ResultRoute | undefined {
-    const matched = this.staticMatchers[path];
+    const matched = this.staticMatchers.get(path);
     if (matched) {
       return {
         callback: matched.callback,
@@ -150,7 +146,7 @@ class PathRouter {
     }
 
     const prefix = path.substring(0, this.minPrefixLength);
-    const matchers = this.matcherByMinPrefix[prefix];
+    const matchers = this.matcherByMinPrefix.get(prefix);
     if (matchers) {
       for (let i = 0; i < matchers.length; i++) {
         const matcher = matchers[i];
