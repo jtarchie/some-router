@@ -312,7 +312,7 @@ class HTTPRouter extends MethodRouter {
     const { params, callback } = this.find(request.method, request.url);
 
     if (callback) {
-      callback(request, response, params);
+      callback({ request, response, params });
       return;
     }
 

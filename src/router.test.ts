@@ -319,7 +319,7 @@ describe("when using http router", () => {
   });
 
   it("handles a GET request", async () => {
-    router.get("/persons/:name", (_request, response, params) => {
+    router.get("/persons/:name", ({ params, response }) => {
       response.writeHead(200);
       response.end(`Hello, ${params.name}`);
     });
