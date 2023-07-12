@@ -9,6 +9,54 @@ Workers, etc.
 
 ## Usage
 
+This library supports several different routing primitives:
+
+- `MethodRouter` supports loading routes based on HTTP verbs (GET, POST, etc.).
+  It does not make assumptions where the request meta-data comes from, so has to
+  be called explicitly.
+- `HTTPRouter` supports the functionality from `MethodRouter`. It loads
+  information of request path and HTTP verb from the HTTP request object.
+
+  ```javascript
+  const http = require("http");
+
+  const host = "localhost";
+  const port = 8000;
+  const router = new HTTPRouter();
+
+  router.get("/persons/:name", ({ params, response }) => {
+    response.writeHead(200);
+    response.end(`Hello, ${params.name}`);
+  });
+
+  const requestListener = function (req, res) {
+    router.lookup(request, response);
+  };
+
+  const server = http.createServer(requestListener);
+  server.listen(port, host, () => {
+    console.log(`Server is running on http://${host}:${port}`);
+  });
+  ```
+
+- `EventRouter` supports `FetchEvent` applications. It was designed to be used
+  with CloudFlare Workers.
+
+  ```javascript
+  const router = new EventRouter();
+  router.get("/persons/:name", ({ params }) => {
+    return new Response(null, {
+      status: 200,
+    });
+  });
+
+  export default {
+    async fetch(request) {
+      return await router.handle(request);
+    },
+  };
+  ```
+
 ```javascript
 import { MethodRouter } from "some-router";
 
@@ -20,7 +68,7 @@ router.get("/a", function () {
   return ("/a");
 });
 
-const { callback } = router.find("/");
+const { callback } = router.find("GET", "/");
 console.assert(callback() == "/");
 ```
 
@@ -28,26 +76,26 @@ console.assert(callback() == "/");
 
 - Static - This is an exact string match.
 
-```javascript
-import { MethodRouter } from "some-router";
+  ```javascript
+  import { MethodRouter } from "some-router";
 
-const router = new MethodRouter();
-router.get("/", () => {});
-```
+  const router = new MethodRouter();
+  router.get("/", () => {});
+  ```
 
 - Named Parameter - This support dynamic content, which will match against a
   regex wildcard (`.*?`). The parameters are returned in a `params` if a
   matching route is found as string values.
 
-```javascript
-import { MethodRouter } from "some-router";
+  ```javascript
+  import { MethodRouter } from "some-router";
 
-const router = new MethodRouter();
-router.get("/persons/:id/children/:child_id", () => {});
+  const router = new MethodRouter();
+  router.get("/persons/:id/children/:child_id", () => {});
 
-const { params } = router.find("/persons/1/children/100");
-console.assert(params == { id: "1", child_id: "100" });
-```
+  const { params } = router.find("GET", "/persons/1/children/100");
+  console.assert(params == { id: "1", child_id: "100" });
+  ```
 
 - Regexes - This supports dynamic content that needs to fit a specific regex
   matcher. The regexes must be represented in a capture group and the values
@@ -62,15 +110,15 @@ console.assert(params == { id: "1", child_id: "100" });
   **NOTE:** Proper escaping of back slash is required. This is because of
   javascript string encoding.
 
-```javascript
-import { MethodRouter } from "some-router";
+  ```javascript
+  import { MethodRouter } from "some-router";
 
-const router = new MethodRouter();
-router.get("/persons/(\\d+)/children/(?<child_id>\\w+)", () => {});
+  const router = new MethodRouter();
+  router.get("/persons/(\\d+)/children/(?<child_id>\\w+)", () => {});
 
-const { params } = router.find("/persons/1/children/100");
-console.assert(params == { regex0: "1", child_id: "100" });
-```
+  const { params } = router.find("GET", "/persons/1/children/100");
+  console.assert(params == { regex0: "1", child_id: "100" });
+  ```
 
 ### Precedence
 
@@ -91,7 +139,7 @@ router.get("/(\w+)", function () {
   return ("dynamic");
 });
 
-const { callback } = router.find("/a");
+const { callback } = router.find("GET", "/a");
 console.assert(callback() == "static");
 ```
 
@@ -103,7 +151,7 @@ const router = new MethodRouter();
 router.get("/:first-:second", () => {});
 router.get("/:first", () => {});
 
-const { params } = router.find("/a-b");
+const { params } = router.find("GET", "/a-b");
 console.assert(params == { "first": "a", "second": "b" });
 ```
 
