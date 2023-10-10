@@ -14,6 +14,22 @@ This library supports several different routing primitives:
 - `MethodRouter` supports loading routes based on HTTP verbs (GET, POST, etc.).
   It does not make assumptions where the request meta-data comes from, so has to
   be called explicitly.
+
+  ```javascript
+  import { MethodRouter } from "some-router";
+
+  const router = new MethodRouter();
+  router.get("/", function () {
+    return ("/");
+  });
+  router.get("/a", function () {
+    return ("/a");
+  });
+
+  const { callback } = router.find("GET", "/");
+  console.assert(callback() == "/");
+  ```
+
 - `HTTPRouter` supports the functionality from `MethodRouter`. It loads
   information of request path and HTTP verb from the HTTP request object.
 
@@ -56,21 +72,6 @@ This library supports several different routing primitives:
     },
   };
   ```
-
-```javascript
-import { MethodRouter } from "some-router";
-
-const router = new MethodRouter();
-router.get("/", function () {
-  return ("/");
-});
-router.get("/a", function () {
-  return ("/a");
-});
-
-const { callback } = router.find("GET", "/");
-console.assert(callback() == "/");
-```
 
 ### Route Types
 
