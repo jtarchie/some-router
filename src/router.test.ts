@@ -2,6 +2,7 @@ import { EventRouter, HTTPRouter, MethodRouter } from ".";
 import { METHODS } from "http";
 import supertest from "supertest";
 import express from "express";
+import { describe, expect, it, beforeEach } from "vitest";
 
 const routes = [
   { method: "GET", url: "/user" },
@@ -284,6 +285,7 @@ describe("a router", () => {
       router.proppatch("/", () => "PROPPATCH /");
       router.purge("/", () => "PURGE /");
       router.put("/", () => "PUT /");
+      router.query("/", () => "QUERY /");
       router.rebind("/", () => "REBIND /");
       router.report("/", () => "REPORT /");
       router.search("/", () => "SEARCH /");
@@ -299,6 +301,7 @@ describe("a router", () => {
     METHODS.forEach((method) => {
       it(`supports ${method}`, () => {
         const { callback } = router.find(method, "/");
+        expect(callback).toBeDefined();
         expect(callback()).toEqual(`${method} /`);
       });
     });
@@ -313,7 +316,7 @@ describe("when using http router", () => {
     app = express();
     router = new HTTPRouter();
 
-    app.get("*", (request, response) => {
+    app.get("/*all", (request, response) => {
       router.lookup(request, response);
     });
   });

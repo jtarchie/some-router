@@ -265,6 +265,9 @@ class MethodRouter {
   put(path: string, callback: Function) {
     this.on("PUT", path, callback);
   }
+  query(path: string, callback: Function) {
+    this.on("QUERY", path, callback);
+  }
   rebind(path: string, callback: Function) {
     this.on("REBIND", path, callback);
   }
