@@ -8,7 +8,7 @@
     "outDir": "dist/",
     "sourceMap": true,
     "strict": true, /* Enable all strict type-checking options. */
-    "target": "es5" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
+    "target": "ESNext" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
   },
   "files": ["src/index.ts"]
 }
