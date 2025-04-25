@@ -1,6 +1,7 @@
 import b from "benny";
 import { MethodRouter } from ".";
 import Router, { HTTPMethod } from "find-my-way";
+import { Router as IttyRouter } from "itty-router";
 
 const routes = [
   { method: "GET", url: "/user" },
@@ -17,7 +18,7 @@ const routes = [
   { method: "GET", url: "/static/*" },
 ];
 
-function noop() {}
+function noop() { }
 
 function createSomeRouter() {
   const router = new MethodRouter();
@@ -39,8 +40,30 @@ function createFindMyWay() {
   return router;
 }
 
+function createIttyRouter() {
+  const router = IttyRouter();
+
+  routes.forEach(function (route) {
+    const method = route.method.toLowerCase();
+    if (method === "get") {
+      router.get(route.url, noop);
+    } else if (method === "post") {
+      router.post(route.url, noop);
+    }
+    // Add other methods as needed
+  });
+
+  return router;
+}
+
 const router1 = createSomeRouter();
 const router2 = createFindMyWay();
+const router3 = createIttyRouter();
+
+// Mock request function to test itty-router
+function createMockRequest(method: string, path: string) {
+  return new Request(`https://example.com${path}`, { method });
+}
 
 b.suite(
   "some-router routes",
@@ -107,6 +130,41 @@ b.suite(
     _ = router2.find("GET", "/event/abcd1234/comments");
     _ = router2.find("GET", "/very/deeply/nested/route/hello/there");
     _ = router2.find("GET", "/static/index.html");
+  }),
+  b.cycle(),
+  b.complete(),
+);
+
+b.suite(
+  "itty-router routes",
+  b.add("setting routes", function () {
+    const _ = createIttyRouter();
+  }),
+  b.add("short static", function () {
+    const _ = router3.handle(createMockRequest("GET", "/user"));
+  }),
+  b.add("static with some radix", function () {
+    const _ = router3.handle(createMockRequest("GET", "/user/comments"));
+  }),
+  b.add("dynamic route", function () {
+    const _ = router3.handle(createMockRequest("GET", "/user/lookup/username/john"));
+  }),
+  b.add("mixed static dynamic", function () {
+    const _ = router3.handle(createMockRequest("GET", "/event/abcd1234/comments"));
+  }),
+  b.add("long static", function () {
+    const _ = router3.handle(createMockRequest("GET", "/very/deeply/nested/route/hello/there"));
+  }),
+  b.add("wildcard", function () {
+    const _ = router3.handle(createMockRequest("GET", "/static/index.html"));
+  }),
+  b.add("all together", function () {
+    let _ = router3.handle(createMockRequest("GET", "/user"));
+    _ = router3.handle(createMockRequest("GET", "/user/comments"));
+    _ = router3.handle(createMockRequest("GET", "/user/lookup/username/john"));
+    _ = router3.handle(createMockRequest("GET", "/event/abcd1234/comments"));
+    _ = router3.handle(createMockRequest("GET", "/very/deeply/nested/route/hello/there"));
+    _ = router3.handle(createMockRequest("GET", "/static/index.html"));
   }),
   b.cycle(),
   b.complete(),

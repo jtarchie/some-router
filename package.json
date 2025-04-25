@@ -21,6 +21,7 @@
     "benny": "^3.7.1",
     "express": "^5.1.0",
     "find-my-way": "^9.3.0",
+    "itty-router": "^5.0.18",
     "regenerator-runtime": "^0.14.1",
     "supertest": "^7.1.0",
     "ts-node": "^10.9.2",
