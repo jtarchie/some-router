@@ -2,7 +2,7 @@ import { EventRouter, HTTPRouter, MethodRouter } from ".";
 import { METHODS } from "http";
 import supertest from "supertest";
 import express from "express";
-import { describe, expect, it, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 const routes = [
   { method: "GET", url: "/user" },

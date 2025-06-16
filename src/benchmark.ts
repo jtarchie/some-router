@@ -18,7 +18,7 @@ const routes = [
   { method: "GET", url: "/static/*" },
 ];
 
-function noop() { }
+function noop() {}
 
 function createSomeRouter() {
   const router = new MethodRouter();
@@ -147,13 +147,19 @@ b.suite(
     const _ = router3.handle(createMockRequest("GET", "/user/comments"));
   }),
   b.add("dynamic route", function () {
-    const _ = router3.handle(createMockRequest("GET", "/user/lookup/username/john"));
+    const _ = router3.handle(
+      createMockRequest("GET", "/user/lookup/username/john"),
+    );
   }),
   b.add("mixed static dynamic", function () {
-    const _ = router3.handle(createMockRequest("GET", "/event/abcd1234/comments"));
+    const _ = router3.handle(
+      createMockRequest("GET", "/event/abcd1234/comments"),
+    );
   }),
   b.add("long static", function () {
-    const _ = router3.handle(createMockRequest("GET", "/very/deeply/nested/route/hello/there"));
+    const _ = router3.handle(
+      createMockRequest("GET", "/very/deeply/nested/route/hello/there"),
+    );
   }),
   b.add("wildcard", function () {
     const _ = router3.handle(createMockRequest("GET", "/static/index.html"));
@@ -163,7 +169,9 @@ b.suite(
     _ = router3.handle(createMockRequest("GET", "/user/comments"));
     _ = router3.handle(createMockRequest("GET", "/user/lookup/username/john"));
     _ = router3.handle(createMockRequest("GET", "/event/abcd1234/comments"));
-    _ = router3.handle(createMockRequest("GET", "/very/deeply/nested/route/hello/there"));
+    _ = router3.handle(
+      createMockRequest("GET", "/very/deeply/nested/route/hello/there"),
+    );
     _ = router3.handle(createMockRequest("GET", "/static/index.html"));
   }),
   b.cycle(),
